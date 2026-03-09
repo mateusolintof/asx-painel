@@ -1,10 +1,7 @@
 import { createClient } from "@/lib/supabase/server"
 import type { DateRange, KPI } from "@/lib/types/database"
-import { calcDelta } from "@/lib/utils/format"
 
 export async function getKPIs(current: DateRange, previous: DateRange): Promise<KPI[]> {
-  const supabase = await createClient()
-
   const [currentData, previousData] = await Promise.all([
     getPeriodStats(current),
     getPeriodStats(previous),
@@ -45,11 +42,13 @@ export async function getKPIs(current: DateRange, previous: DateRange): Promise<
 async function getPeriodStats(period: DateRange) {
   const supabase = await createClient()
 
-  const { data: leads } = await supabase
+  const { data: leads, error: leadsErr } = await supabase
     .from("fb_leads")
     .select("path, status")
     .gte("created_at", period.from)
     .lte("created_at", period.to)
+
+  if (leadsErr) throw new Error(`Failed to fetch leads: ${leadsErr.message}`)
 
   const { data: qualifiedLeads } = await supabase
     .from("leads")
@@ -70,17 +69,27 @@ async function getPeriodStats(period: DateRange) {
   }
 }
 
-export async function getTrendData(days: number = 30) {
+export async function getTrendData(period?: DateRange) {
   const supabase = await createClient()
-  const from = new Date()
-  from.setDate(from.getDate() - days)
 
-  const { data } = await supabase
+  let query = supabase
     .from("v_funnel_summary")
     .select("*")
-    .gte("day", from.toISOString().split("T")[0])
     .order("day", { ascending: true })
 
+  if (period) {
+    query = query
+      .gte("day", period.from.split("T")[0])
+      .lte("day", period.to.split("T")[0])
+  } else {
+    const from = new Date()
+    from.setDate(from.getDate() - 30)
+    query = query.gte("day", from.toISOString().split("T")[0])
+  }
+
+  const { data, error } = await query
+
+  if (error) throw new Error(`Failed to fetch trend data: ${error.message}`)
   return data ?? []
 }
 
@@ -95,7 +104,9 @@ export async function getPathDistribution(period?: DateRange) {
     query = query.gte("created_at", period.from).lte("created_at", period.to)
   }
 
-  const { data } = await query
+  const { data, error } = await query
+
+  if (error) throw new Error(`Failed to fetch path distribution: ${error.message}`)
 
   const rows = data ?? []
   return [

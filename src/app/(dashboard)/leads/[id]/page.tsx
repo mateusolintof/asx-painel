@@ -125,7 +125,7 @@ export default async function LeadDetailPage({ params }: Props) {
                 Distribuidores Recomendados
               </h3>
               <div className="space-y-2">
-                {recommendations.map((rec: any, i: number) => (
+                {recommendations.map((rec: Record<string, any>, i: number) => (
                   <div
                     key={i}
                     className="flex items-center justify-between rounded-md border border-[#E5E7EB] px-4 py-3 text-sm"
@@ -152,7 +152,7 @@ export default async function LeadDetailPage({ params }: Props) {
             <p className="text-sm text-[#6B7280]">Nenhuma mensagem registrada</p>
           ) : (
             <div className="space-y-3">
-              {messages.map((msg: any) => (
+              {messages.map((msg: { id: string; direction: string; content: string; created_at: string }) => (
                 <div
                   key={msg.id}
                   className={`flex gap-2 ${msg.direction === "assistant" ? "" : "flex-row-reverse"}`}

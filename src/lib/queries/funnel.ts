@@ -19,7 +19,8 @@ export async function getFunnelData(period?: DateRange): Promise<FunnelStage[]> 
     query = query.gte("created_at", period.from).lte("created_at", period.to)
   }
 
-  const { data } = await query
+  const { data, error } = await query
+  if (error) throw new Error(`Failed to fetch funnel data: ${error.message}`)
   const rows = data ?? []
   const total = rows.length
 

@@ -1,7 +1,7 @@
 import { Card } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
 import { TrendingUp, TrendingDown, Minus } from "lucide-react"
-import { formatNumber, formatPercent, calcDelta } from "@/lib/utils/format"
+import { formatNumber, formatPercent, formatCurrency, calcDelta } from "@/lib/utils/format"
 
 interface KPICardProps {
   label: string
@@ -19,7 +19,11 @@ export function KPICard({
   accentColor = "#B2121A",
 }: KPICardProps) {
   const formatted =
-    format === "percent" ? formatPercent(value) : formatNumber(value)
+    format === "percent"
+      ? formatPercent(value)
+      : format === "currency"
+        ? formatCurrency(value)
+        : formatNumber(value)
 
   const delta =
     previousValue !== undefined ? calcDelta(value, previousValue) : null

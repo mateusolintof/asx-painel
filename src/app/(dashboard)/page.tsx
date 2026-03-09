@@ -43,7 +43,7 @@ export default async function OverviewPage({ searchParams }: Props) {
 
   const [kpis, trend, funnel, pathDist] = await Promise.all([
     getKPIs(current, previous),
-    getTrendData(daysInRange),
+    getTrendData(current),
     getFunnelData(current),
     getPathDistribution(current),
   ])

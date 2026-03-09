@@ -7,6 +7,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import { StateFilter } from "@/components/dashboard/state-filter"
 import { getDistributorStats } from "@/lib/queries/distributors"
 import { formatNumber, formatDate } from "@/lib/utils/format"
 import { Building2, Users, MapPin } from "lucide-react"
@@ -64,26 +65,10 @@ export default async function DistribuidoresPage({ searchParams }: Props) {
           <h2 className="text-base font-medium text-[#111827]">
             Distribuidores Recomendados
           </h2>
-          <form>
-            <select
-              name="estado"
-              defaultValue={params.estado ?? ""}
-              className="rounded-md border border-[#E5E7EB] bg-white px-3 py-2 text-sm text-[#111827]"
-              onChange={(e) => {
-                const url = e.target.value
-                  ? `?estado=${e.target.value}`
-                  : "/distribuidores"
-                window.location.href = url
-              }}
-            >
-              <option value="">Todos os Estados</option>
-              {data.availableStates.map((uf) => (
-                <option key={uf} value={uf}>
-                  {uf}
-                </option>
-              ))}
-            </select>
-          </form>
+          <StateFilter
+            currentState={params.estado}
+            states={data.availableStates}
+          />
         </div>
 
         <div className="overflow-x-auto rounded-lg border border-[#E5E7EB]">

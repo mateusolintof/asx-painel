@@ -73,11 +73,13 @@ export async function comparePeriods(
 async function getPeriodAggregates(period: DateRange) {
   const supabase = await createClient()
 
-  const { data: leads } = await supabase
+  const { data: leads, error: leadsErr } = await supabase
     .from("fb_leads")
     .select("path, status")
     .gte("created_at", period.from)
     .lte("created_at", period.to)
+
+  if (leadsErr) throw new Error(`Failed to fetch comparison data: ${leadsErr.message}`)
 
   const { data: scored } = await supabase
     .from("leads")

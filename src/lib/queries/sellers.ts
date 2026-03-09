@@ -13,49 +13,61 @@ export interface SellerStats {
 export async function getSellerPerformance(): Promise<SellerStats[]> {
   const supabase = await createClient()
 
-  const { data: agents } = await supabase
+  // 1. Buscar todos os agentes
+  const { data: agents, error: agentErr } = await supabase
     .from("agents")
     .select("*")
 
-  if (!agents) return []
+  if (agentErr) throw new Error(`Failed to fetch agents: ${agentErr.message}`)
+  if (!agents || agents.length === 0) return []
 
-  const stats: SellerStats[] = []
+  // 2. Batch: buscar todas as assignments de uma vez
+  const agentIds = agents.map((a) => a.id)
+  const { data: allAssignments } = await supabase
+    .from("assignments")
+    .select("lead_id, assignee_id, assigned_at")
+    .in("assignee_id", agentIds)
+    .order("assigned_at", { ascending: false })
 
-  for (const agent of agents) {
-    const { data: assignments } = await supabase
-      .from("assignments")
-      .select("lead_id, assigned_at")
-      .eq("assignee_id", agent.id)
-      .order("assigned_at", { ascending: false })
+  const assignments = allAssignments ?? []
 
-    const leadIds = (assignments ?? []).map((a) => a.lead_id)
+  // 3. Batch: buscar todos os leads referenciados
+  const leadIds = [...new Set(assignments.map((a) => a.lead_id))]
+  let leadMap = new Map<string, { score: number; class: string }>()
 
-    let leads: { score: number; class: string }[] = []
-    if (leadIds.length > 0) {
-      const { data } = await supabase
-        .from("leads")
-        .select("score, class")
-        .in("id", leadIds)
-      leads = data ?? []
+  if (leadIds.length > 0) {
+    const { data: leads } = await supabase
+      .from("leads")
+      .select("id, score, class")
+      .in("id", leadIds)
+
+    for (const l of leads ?? []) {
+      leadMap.set(String(l.id), { score: l.score, class: l.class })
     }
+  }
+
+  // 4. Montar resultado por agente
+  return agents.map((agent) => {
+    const agentAssignments = assignments.filter((a) => a.assignee_id === agent.id)
+    const agentLeads = agentAssignments
+      .map((a) => leadMap.get(String(a.lead_id)))
+      .filter((l): l is { score: number; class: string } => l != null)
 
     const scoreDistribution = ["quente", "morno", "frio"].map((cls) => ({
       class: cls,
-      count: leads.filter((l) => l.class === cls).length,
+      count: agentLeads.filter((l) => l.class === cls).length,
     }))
 
-    stats.push({
+    return {
       id: agent.id,
       name: agent.name,
       phone: agent.phone,
-      totalLeads: leadIds.length,
-      avgScore: leads.length > 0
-        ? Math.round(leads.reduce((s, l) => s + l.score, 0) / leads.length)
+      totalLeads: agentAssignments.length,
+      avgScore: agentLeads.length > 0
+        ? Math.round(agentLeads.reduce((s, l) => s + l.score, 0) / agentLeads.length)
         : 0,
       scoreDistribution,
-      latestAssignment: assignments?.[0]?.assigned_at ?? null,
-    })
-  }
-
-  return stats
+      latestAssignment: agentAssignments[0]?.assigned_at ?? null,
+    }
+  })
 }

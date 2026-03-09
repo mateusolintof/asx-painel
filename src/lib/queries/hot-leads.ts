@@ -21,70 +21,100 @@ export interface HotLead {
 export async function getHotLeads(): Promise<HotLead[]> {
   const supabase = await createClient()
 
-  // Path 3 leads que estao parados (nao completaram handoff ou estao stale)
-  const { data: fbLeads } = await supabase
+  // 1. Buscar todos os fb_leads Path 3 parados
+  const { data: fbLeads, error: fbErr } = await supabase
     .from("fb_leads")
     .select("*")
     .eq("path", 3)
     .in("status", ["contacted", "in_conversation"])
     .order("created_at", { ascending: true })
 
+  if (fbErr) throw new Error(`Failed to fetch hot leads: ${fbErr.message}`)
   if (!fbLeads || fbLeads.length === 0) return []
 
-  const results: HotLead[] = []
+  const phones = fbLeads.map((fl) => fl.telefone)
 
-  for (const fl of fbLeads) {
-    // Ultima mensagem
-    const { data: lastMsg } = await supabase
-      .from("ia_messages")
-      .select("created_at")
-      .eq("phone", fl.telefone)
-      .order("created_at", { ascending: false })
-      .limit(1)
-      .maybeSingle()
+  // 2. Batch: buscar todos os contatos por telefone
+  const { data: contacts } = await supabase
+    .from("contacts")
+    .select("id, phone")
+    .in("phone", phones)
 
-    // Lead qualificado (se ja foi scored)
-    const { data: contact } = await supabase
-      .from("contacts")
-      .select("id")
-      .eq("phone", fl.telefone)
-      .maybeSingle()
+  const contactMap = new Map(
+    (contacts ?? []).map((c) => [c.phone, c.id])
+  )
 
-    let qualifiedLead = null
-    let seller = null
+  // 3. Batch: buscar todos os leads qualificados por contact_id
+  const contactIds = [...contactMap.values()]
+  let leadMap = new Map<string, { id: string; score: number; class: string; priority: string }>()
 
-    if (contact) {
-      const { data: lead } = await supabase
-        .from("leads")
-        .select("id, score, class, priority")
-        .eq("contact_id", contact.id)
-        .maybeSingle()
-      qualifiedLead = lead
+  if (contactIds.length > 0) {
+    const { data: leads } = await supabase
+      .from("leads")
+      .select("id, contact_id, score, class, priority")
+      .in("contact_id", contactIds)
 
-      if (lead) {
-        const { data: assignment } = await supabase
-          .from("assignments")
-          .select("assignee_id")
-          .eq("lead_id", lead.id)
-          .maybeSingle()
-
-        if (assignment) {
-          const { data: agent } = await supabase
-            .from("agents")
-            .select("name")
-            .eq("id", assignment.assignee_id)
-            .maybeSingle()
-          seller = agent?.name ?? null
-        }
-      }
+    for (const lead of leads ?? []) {
+      leadMap.set(String(lead.contact_id), lead)
     }
+  }
 
-    const lastActivity = lastMsg?.created_at ?? fl.created_at
+  // 4. Batch: buscar todas as assignments por lead_id
+  const leadIds = [...leadMap.values()].map((l) => l.id)
+  let assignmentMap = new Map<string, string>()
+
+  if (leadIds.length > 0) {
+    const { data: assignments } = await supabase
+      .from("assignments")
+      .select("lead_id, assignee_id")
+      .in("lead_id", leadIds)
+
+    for (const a of assignments ?? []) {
+      assignmentMap.set(String(a.lead_id), String(a.assignee_id))
+    }
+  }
+
+  // 5. Batch: buscar todos os agentes
+  const agentIds = [...new Set(assignmentMap.values())]
+  let agentMap = new Map<string, string>()
+
+  if (agentIds.length > 0) {
+    const { data: agents } = await supabase
+      .from("agents")
+      .select("id, name")
+      .in("id", agentIds)
+
+    for (const ag of agents ?? []) {
+      agentMap.set(String(ag.id), ag.name)
+    }
+  }
+
+  // 6. Batch: buscar ultima mensagem por telefone
+  const { data: allMessages } = await supabase
+    .from("ia_messages")
+    .select("phone, created_at")
+    .in("phone", phones)
+    .order("created_at", { ascending: false })
+
+  const lastMsgMap = new Map<string, string>()
+  for (const msg of allMessages ?? []) {
+    if (!lastMsgMap.has(msg.phone)) {
+      lastMsgMap.set(msg.phone, msg.created_at)
+    }
+  }
+
+  // 7. Montar resultado
+  const results: HotLead[] = fbLeads.map((fl) => {
+    const contactId = contactMap.get(fl.telefone)
+    const qualifiedLead = contactId ? leadMap.get(String(contactId)) : null
+    const assigneeId = qualifiedLead ? assignmentMap.get(String(qualifiedLead.id)) : null
+    const vendedor = assigneeId ? agentMap.get(assigneeId) ?? null : null
+    const lastActivity = lastMsgMap.get(fl.telefone) ?? fl.created_at
     const hoursWaiting = Math.round(
       (Date.now() - new Date(lastActivity).getTime()) / 3600000
     )
 
-    results.push({
+    return {
       fb_lead_id: fl.id,
       nome: fl.nome,
       telefone: fl.telefone,
@@ -96,12 +126,12 @@ export async function getHotLeads(): Promise<HotLead[]> {
       score: qualifiedLead?.score ?? null,
       class: qualifiedLead?.class ?? null,
       priority: qualifiedLead?.priority ?? null,
-      vendedor: seller,
+      vendedor,
       lead_created_at: fl.created_at,
       last_activity: lastActivity,
       hours_waiting: hoursWaiting,
-    })
-  }
+    }
+  })
 
   // Sort: priority (urgent > high > medium), then by hours_waiting desc
   const priorityOrder: Record<string, number> = { urgent: 0, high: 1, medium: 2 }

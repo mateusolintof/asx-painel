@@ -14,17 +14,19 @@ export async function getDistributorStats(estado?: string) {
   const supabase = await createClient()
 
   // Total Path 2 redirections
-  const { count: totalRedirections } = await supabase
+  const { count: totalRedirections, error: countErr } = await supabase
     .from("fb_leads")
     .select("*", { count: "exact", head: true })
     .eq("path", 2)
 
+  if (countErr) throw new Error(`Failed to fetch redirect count: ${countErr.message}`)
+
   // Get all recommendations with distributor data
-  let recQuery = supabase
+  const { data: recommendations, error: recErr } = await supabase
     .from("distributor_recommendations")
     .select("distributor_id, recommended_at, distributors(id, razao_social, cidade, estado_uf, tipo_representantes)")
 
-  const { data: recommendations } = await recQuery
+  if (recErr) throw new Error(`Failed to fetch recommendations: ${recErr.message}`)
 
   // Aggregate by distributor
   const distributorMap = new Map<number, DistributorStats>()

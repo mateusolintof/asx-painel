@@ -109,7 +109,7 @@ export default async function LeadsQuentesPage() {
                   return (
                     <TableRow
                       key={lead.fb_lead_id}
-                      className={`cursor-pointer transition-colors hover:bg-[#FAFAFA] ${
+                      className={`transition-colors hover:bg-[#FAFAFA] ${
                         lead.hours_waiting > 24 ? "bg-red-50/50" : ""
                       }`}
                     >

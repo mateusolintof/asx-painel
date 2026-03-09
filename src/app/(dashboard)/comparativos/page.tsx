@@ -1,3 +1,4 @@
+import Link from "next/link"
 import { Card } from "@/components/ui/card"
 import { ComparisonChart } from "@/components/dashboard/comparison-chart"
 import { comparePeriods } from "@/lib/queries/comparisons"
@@ -56,7 +57,7 @@ export default async function ComparativosPage({ searchParams }: Props) {
           { key: "week", label: "Semana" },
           { key: "month", label: "M\u00eas" },
         ].map((p) => (
-          <a
+          <Link
             key={p.key}
             href={`?preset=${p.key}`}
             className={cn(
@@ -67,7 +68,7 @@ export default async function ComparativosPage({ searchParams }: Props) {
             )}
           >
             {p.label}
-          </a>
+          </Link>
         ))}
       </div>
 

@@ -26,9 +26,13 @@ export async function getLeads(filters: LeadFilters = {}) {
     query = query.lte("created_at", filters.to)
   }
   if (filters.search) {
-    query = query.or(
-      `nome.ilike.%${filters.search}%,telefone.ilike.%${filters.search}%,cnpj.ilike.%${filters.search}%,razao_social.ilike.%${filters.search}%`
-    )
+    // Sanitizar: remover caracteres que quebram o filtro PostgREST
+    const safe = filters.search.replace(/[,.'"%()]/g, "")
+    if (safe.length > 0) {
+      query = query.or(
+        `nome.ilike.%${safe}%,telefone.ilike.%${safe}%,cnpj.ilike.%${safe}%,razao_social.ilike.%${safe}%`
+      )
+    }
   }
 
   const sortBy = filters.sortBy ?? "created_at"
@@ -38,6 +42,8 @@ export async function getLeads(filters: LeadFilters = {}) {
   query = query.range(offset, offset + pageSize - 1)
 
   const { data, count, error } = await query
+
+  if (error) throw new Error(`Failed to fetch leads: ${error.message}`)
 
   return {
     leads: (data ?? []) as FbLead[],
@@ -51,26 +57,31 @@ export async function getLeads(filters: LeadFilters = {}) {
 export async function getLeadById(id: string) {
   const supabase = await createClient()
 
-  const { data: fbLead } = await supabase
+  const { data: fbLead, error: fbErr } = await supabase
     .from("fb_leads")
     .select("*")
     .eq("id", id)
     .single()
 
-  if (!fbLead) return null
+  if (fbErr || !fbLead) return null
 
-  // Buscar lead qualificado (se existir)
-  const { data: qualifiedLead } = await supabase
-    .from("leads")
-    .select("*, assignments(*)")
-    .eq("contact_id", (
-      await supabase
-        .from("contacts")
-        .select("id")
-        .eq("phone", fbLead.telefone)
-        .single()
-    ).data?.id ?? "")
+  // Buscar contato pelo telefone
+  const { data: contact } = await supabase
+    .from("contacts")
+    .select("id")
+    .eq("phone", fbLead.telefone)
     .maybeSingle()
+
+  // Buscar lead qualificado (se existir contato)
+  let qualifiedLead = null
+  if (contact?.id) {
+    const { data } = await supabase
+      .from("leads")
+      .select("*, assignments(*)")
+      .eq("contact_id", contact.id)
+      .maybeSingle()
+    qualifiedLead = data
+  }
 
   // Buscar mensagens
   const { data: messages } = await supabase
