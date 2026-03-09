@@ -29,7 +29,10 @@ export async function getHotLeads(): Promise<HotLead[]> {
     .in("status", ["contacted", "in_conversation"])
     .order("created_at", { ascending: true })
 
-  if (fbErr) throw new Error(`Failed to fetch hot leads: ${fbErr.message}`)
+  if (fbErr) {
+    console.error(`Failed to fetch hot leads: ${fbErr.message}`)
+    return []
+  }
   if (!fbLeads || fbLeads.length === 0) return []
 
   const phones = fbLeads.map((fl) => fl.telefone)

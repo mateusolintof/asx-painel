@@ -48,7 +48,10 @@ async function getPeriodStats(period: DateRange) {
     .gte("created_at", period.from)
     .lte("created_at", period.to)
 
-  if (leadsErr) throw new Error(`Failed to fetch leads: ${leadsErr.message}`)
+  if (leadsErr) {
+    console.error(`Failed to fetch leads: ${leadsErr.message}`)
+    return { total: 0, qualified: 0, handoff: 0, avgScore: 0 }
+  }
 
   const { data: qualifiedLeads } = await supabase
     .from("leads")
@@ -89,7 +92,10 @@ export async function getTrendData(period?: DateRange) {
 
   const { data, error } = await query
 
-  if (error) throw new Error(`Failed to fetch trend data: ${error.message}`)
+  if (error) {
+    console.error(`Failed to fetch trend data: ${error.message}`)
+    return []
+  }
   return data ?? []
 }
 
@@ -106,7 +112,10 @@ export async function getPathDistribution(period?: DateRange) {
 
   const { data, error } = await query
 
-  if (error) throw new Error(`Failed to fetch path distribution: ${error.message}`)
+  if (error) {
+    console.error(`Failed to fetch path distribution: ${error.message}`)
+    return []
+  }
 
   const rows = data ?? []
   return [

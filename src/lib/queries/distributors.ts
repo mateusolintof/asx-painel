@@ -19,14 +19,19 @@ export async function getDistributorStats(estado?: string) {
     .select("*", { count: "exact", head: true })
     .eq("path", 2)
 
-  if (countErr) throw new Error(`Failed to fetch redirect count: ${countErr.message}`)
+  if (countErr) {
+    console.error(`Failed to fetch redirect count: ${countErr.message}`)
+  }
 
   // Get all recommendations with distributor data
   const { data: recommendations, error: recErr } = await supabase
     .from("distributor_recommendations")
     .select("distributor_id, recommended_at, distributors(id, razao_social, cidade, estado_uf, tipo_representantes)")
 
-  if (recErr) throw new Error(`Failed to fetch recommendations: ${recErr.message}`)
+  if (recErr) {
+    console.error(`Failed to fetch recommendations: ${recErr.message}`)
+    return { totalRedirections: totalRedirections ?? 0, uniqueDistributors: 0, distributors: [], availableStates: [] }
+  }
 
   // Aggregate by distributor
   const distributorMap = new Map<number, DistributorStats>()

@@ -79,7 +79,10 @@ async function getPeriodAggregates(period: DateRange) {
     .gte("created_at", period.from)
     .lte("created_at", period.to)
 
-  if (leadsErr) throw new Error(`Failed to fetch comparison data: ${leadsErr.message}`)
+  if (leadsErr) {
+    console.error(`Failed to fetch comparison data: ${leadsErr.message}`)
+    return { total: 0, qualified: 0, handoff: 0, disqualified: 0, avgScore: 0 }
+  }
 
   const { data: scored } = await supabase
     .from("leads")

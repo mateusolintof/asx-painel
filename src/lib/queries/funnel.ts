@@ -20,7 +20,10 @@ export async function getFunnelData(period?: DateRange): Promise<FunnelStage[]> 
   }
 
   const { data, error } = await query
-  if (error) throw new Error(`Failed to fetch funnel data: ${error.message}`)
+  if (error) {
+    console.error(`Failed to fetch funnel data: ${error.message}`)
+    return []
+  }
   const rows = data ?? []
   const total = rows.length
 

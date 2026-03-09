@@ -43,7 +43,10 @@ export async function getLeads(filters: LeadFilters = {}) {
 
   const { data, count, error } = await query
 
-  if (error) throw new Error(`Failed to fetch leads: ${error.message}`)
+  if (error) {
+    console.error(`Failed to fetch leads: ${error.message}`)
+    return { leads: [] as FbLead[], total: 0, page, pageSize, totalPages: 0 }
+  }
 
   return {
     leads: (data ?? []) as FbLead[],

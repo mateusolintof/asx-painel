@@ -18,7 +18,10 @@ export async function getSellerPerformance(): Promise<SellerStats[]> {
     .from("agents")
     .select("*")
 
-  if (agentErr) throw new Error(`Failed to fetch agents: ${agentErr.message}`)
+  if (agentErr) {
+    console.error(`Failed to fetch agents: ${agentErr.message}`)
+    return []
+  }
   if (!agents || agents.length === 0) return []
 
   // 2. Batch: buscar todas as assignments de uma vez
