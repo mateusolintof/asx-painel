@@ -1,36 +1,64 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# ASX Painel — Dashboard de Gestao Comercial
 
-## Getting Started
+Painel de gestao para a equipe da **ASX Iluminacao Automotiva** acompanhar leads, funil de vendas, vendedores e distribuidores.
 
-First, run the development server:
+**Este painel faz parte de um sistema maior:** o Agente SDR de IA da ASX, que qualifica leads B2B vindos do Facebook Ads via WhatsApp. Para entender o sistema completo, leia [`docs/arquitetura.md`](docs/arquitetura.md).
+
+---
+
+## Stack
+
+- **Next.js 16** (App Router, Server Components)
+- **React 19** + **TypeScript**
+- **Tailwind CSS 4** + **Shadcn/UI 4**
+- **Recharts** (graficos)
+- **Supabase** (banco de dados + auth)
+
+## Paginas
+
+| Rota | Pagina | O que mostra |
+|------|--------|-------------|
+| `/` | Overview | KPIs, trend line, distribuicao por path, funil resumido |
+| `/leads` | Leads | Tabela paginada com filtros (path, status, busca) |
+| `/leads/:id` | Detalhe | Dados do lead + historico de conversa com o agente |
+| `/funil` | Funil | 7 estagios do funil com taxas de conversao |
+| `/vendedores` | Vendedores | Performance de cada vendedor (leads, scores) |
+| `/distribuidores` | Distribuidores | Recomendacoes feitas para leads Path 2 |
+| `/comparativos` | Comparativos | Semana/Mes atual vs anterior |
+| `/leads-quentes` | Leads Quentes | Leads Path 3 parados que precisam de atencao |
+
+## Como rodar
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+# Copiar variaveis de ambiente
+cp .env.local.example .env.local
+# Editar .env.local com as chaves do Supabase
+
+# Instalar e rodar
+npm install
+npm run dev        # http://localhost:3000
+npm run build      # Verificar tipos e compilar
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Variaveis de ambiente
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```
+NEXT_PUBLIC_SUPABASE_URL=https://...
+NEXT_PUBLIC_SUPABASE_ANON_KEY=...
+SUPABASE_SERVICE_ROLE_KEY=...
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Deploy
 
-## Learn More
+Vercel (recomendado):
+1. Push para GitHub
+2. Import no Vercel
+3. Configurar env vars
+4. Dominio: `painel.asxiluminacao.com.br`
 
-To learn more about Next.js, take a look at the following resources:
+## Documentacao
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- [`CLAUDE.md`](CLAUDE.md) — Instrucoes para IA (stack, estrutura, regras)
+- [`docs/arquitetura.md`](docs/arquitetura.md) — Arquitetura do sistema completo
+- [`.interface-design/system.md`](.interface-design/system.md) — Design system (cores, tokens, padroes)
+- [`supabase-views.sql`](supabase-views.sql) — Views SQL para executar no Supabase

@@ -1,0 +1,88 @@
+import { Card } from "@/components/ui/card"
+import { FunnelChart } from "@/components/dashboard/funnel-chart"
+import { DateRangePicker } from "@/components/dashboard/date-range-picker"
+import { getFunnelData } from "@/lib/queries/funnel"
+import { formatNumber, formatPercent } from "@/lib/utils/format"
+
+interface Props {
+  searchParams: Promise<{ from?: string; to?: string }>
+}
+
+export default async function FunilPage({ searchParams }: Props) {
+  const params = await searchParams
+  const period =
+    params.from && params.to
+      ? { from: params.from, to: params.to }
+      : undefined
+
+  const funnel = await getFunnelData(period)
+
+  return (
+    <div className="space-y-8">
+      {/* Date Filter */}
+      <div className="flex items-center justify-between">
+        <p className="text-sm text-[#6B7280]">
+          {period ? "Periodo personalizado" : "Todos os leads"}
+        </p>
+        <DateRangePicker />
+      </div>
+
+      {/* Summary Cards */}
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-4 lg:grid-cols-7">
+        {funnel.map((stage) => (
+          <Card key={stage.stage} className="border bg-white p-4">
+            <p className="text-xs text-[#6B7280]">{stage.stage}</p>
+            <p className="mt-1 text-2xl font-semibold text-[#111827]">
+              {formatNumber(stage.count)}
+            </p>
+            <p className="text-xs text-[#9CA3AF]">{formatPercent(stage.percentage)}</p>
+          </Card>
+        ))}
+      </div>
+
+      {/* Funnel Chart */}
+      <Card className="border bg-white p-6">
+        <h2 className="mb-4 text-base font-medium text-[#111827]">
+          Funil de Convers{"\u00e3"}o
+        </h2>
+        <FunnelChart data={funnel} />
+      </Card>
+
+      {/* Conversion Rates */}
+      {funnel.length > 0 && (
+        <Card className="border bg-white p-6">
+          <h2 className="mb-4 text-base font-medium text-[#111827]">
+            Taxas de Convers{"\u00e3"}o
+          </h2>
+          <div className="space-y-3">
+            {funnel.slice(1).map((stage, i) => {
+              const prevCount = funnel[i].count
+              const rate = prevCount > 0 ? (stage.count / prevCount) * 100 : 0
+              return (
+                <div key={stage.stage} className="flex items-center gap-4">
+                  <span className="w-40 shrink-0 text-sm text-[#6B7280]">
+                    {funnel[i].stage} {"\u2192"} {stage.stage}
+                  </span>
+                  <div className="flex-1">
+                    <div className="h-2 overflow-hidden rounded-full bg-[#F3F4F6]">
+                      <div
+                        className="h-full rounded-full transition-all"
+                        style={{
+                          width: `${Math.min(rate, 100)}%`,
+                          backgroundColor: stage.color,
+                        }}
+                      />
+                    </div>
+                  </div>
+                  <span className="w-16 text-right text-sm font-medium text-[#111827]">
+                    {formatPercent(rate)}
+                  </span>
+                </div>
+              )
+            })}
+          </div>
+        </Card>
+      )}
+    </div>
+  )
+}
