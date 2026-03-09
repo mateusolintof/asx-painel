@@ -10,7 +10,6 @@ import {
   Legend,
 } from "recharts"
 import type { ComparisonMetric } from "@/lib/queries/comparisons"
-import { formatNumber, formatPercent } from "@/lib/utils/format"
 
 interface ComparisonChartProps {
   data: ComparisonMetric[]

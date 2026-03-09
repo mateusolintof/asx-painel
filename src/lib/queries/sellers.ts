@@ -33,7 +33,7 @@ export async function getSellerPerformance(): Promise<SellerStats[]> {
 
   // 3. Batch: buscar todos os leads referenciados
   const leadIds = [...new Set(assignments.map((a) => a.lead_id))]
-  let leadMap = new Map<string, { score: number; class: string }>()
+  const leadMap = new Map<string, { score: number; class: string }>()
 
   if (leadIds.length > 0) {
     const { data: leads } = await supabase

@@ -46,7 +46,7 @@ export async function getHotLeads(): Promise<HotLead[]> {
 
   // 3. Batch: buscar todos os leads qualificados por contact_id
   const contactIds = [...contactMap.values()]
-  let leadMap = new Map<string, { id: string; score: number; class: string; priority: string }>()
+  const leadMap = new Map<string, { id: string; score: number; class: string; priority: string }>()
 
   if (contactIds.length > 0) {
     const { data: leads } = await supabase
@@ -61,7 +61,7 @@ export async function getHotLeads(): Promise<HotLead[]> {
 
   // 4. Batch: buscar todas as assignments por lead_id
   const leadIds = [...leadMap.values()].map((l) => l.id)
-  let assignmentMap = new Map<string, string>()
+  const assignmentMap = new Map<string, string>()
 
   if (leadIds.length > 0) {
     const { data: assignments } = await supabase
@@ -76,7 +76,7 @@ export async function getHotLeads(): Promise<HotLead[]> {
 
   // 5. Batch: buscar todos os agentes
   const agentIds = [...new Set(assignmentMap.values())]
-  let agentMap = new Map<string, string>()
+  const agentMap = new Map<string, string>()
 
   if (agentIds.length > 0) {
     const { data: agents } = await supabase

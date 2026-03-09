@@ -1,7 +1,6 @@
 import { notFound } from "next/navigation"
 import Link from "next/link"
 import { Card } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { PathBadge } from "@/components/dashboard/path-badge"
 import { StatusBadge } from "@/components/dashboard/status-badge"
@@ -125,7 +124,7 @@ export default async function LeadDetailPage({ params }: Props) {
                 Distribuidores Recomendados
               </h3>
               <div className="space-y-2">
-                {recommendations.map((rec: Record<string, any>, i: number) => (
+                {recommendations.map((rec: { distributors?: { razao_social?: string; cidade?: string; estado_uf?: string } }, i: number) => (
                   <div
                     key={i}
                     className="flex items-center justify-between rounded-md border border-[#E5E7EB] px-4 py-3 text-sm"
