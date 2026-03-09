@@ -42,9 +42,9 @@ export interface Lead {
   perfil: string
   regiao: string
   volume: string
-  score: number
-  class: ScoreClass
-  priority: Priority
+  score: number | null
+  class: ScoreClass | null
+  priority: Priority | null
   source: string
   qualified_at: string
   ja_compra_asx_regiao: string

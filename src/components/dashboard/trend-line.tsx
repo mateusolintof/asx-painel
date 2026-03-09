@@ -24,13 +24,16 @@ export function TrendLine({ data }: TrendLineProps) {
     )
   }
 
-  const formatted = data.map((d) => ({
-    ...d,
-    dayLabel: new Date(d.day).toLocaleDateString("pt-BR", {
-      day: "2-digit",
-      month: "2-digit",
-    }),
-  }))
+  const formatted = data.map((d) => {
+    const [year, month, day] = d.day.split("-").map(Number)
+    return {
+      ...d,
+      dayLabel: new Date(year, month - 1, day).toLocaleDateString("pt-BR", {
+        day: "2-digit",
+        month: "2-digit",
+      }),
+    }
+  })
 
   return (
     <ResponsiveContainer width="100%" height={280}>

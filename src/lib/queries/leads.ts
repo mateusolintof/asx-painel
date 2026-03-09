@@ -35,7 +35,10 @@ export async function getLeads(filters: LeadFilters = {}) {
     }
   }
 
-  const sortBy = filters.sortBy ?? "created_at"
+  const ALLOWED_SORT = ["created_at", "nome", "status", "path", "estado_envio"] as const
+  const sortBy = ALLOWED_SORT.includes(filters.sortBy as (typeof ALLOWED_SORT)[number])
+    ? filters.sortBy!
+    : "created_at"
   const sortOrder = filters.sortOrder ?? "desc"
   query = query.order(sortBy, { ascending: sortOrder === "asc" })
 
