@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
-import { createClient } from "@/lib/supabase/client"
+import { login } from "./actions"
 
 export default function LoginPage() {
   const [email, setEmail] = useState("")
@@ -18,19 +18,20 @@ export default function LoginPage() {
     setError("")
     setLoading(true)
 
-    const supabase = createClient()
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    })
+    try {
+      const result = await login(email, password)
 
-    if (error) {
-      setError("Email ou senha incorretos")
+      if (result.error) {
+        setError(result.error)
+        setLoading(false)
+        return
+      }
+
+      window.location.href = "/"
+    } catch {
+      setError("Erro ao conectar com o servidor")
       setLoading(false)
-      return
     }
-
-    window.location.href = "/"
   }
 
   return (
