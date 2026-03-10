@@ -78,14 +78,14 @@ export default async function OverviewPage({ searchParams }: Props) {
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <Card className="col-span-1 border bg-white p-6 lg:col-span-2">
           <h2 className="mb-4 text-base font-medium text-[#111827]">
-            Leads nos {"\u00fa"}ltimos {daysInRange} dias
+            Leads nos últimos {daysInRange} dias
           </h2>
           <TrendLine data={trend} />
         </Card>
 
         <Card className="border bg-white p-6">
           <h2 className="mb-4 text-base font-medium text-[#111827]">
-            Distribui{"\u00e7\u00e3"}o por Path
+            Distribuição por Path
           </h2>
           <PathPieChart data={pathDist} />
         </Card>
@@ -94,7 +94,7 @@ export default async function OverviewPage({ searchParams }: Props) {
       {/* Funnel */}
       <Card className="border bg-white p-6">
         <h2 className="mb-4 text-base font-medium text-[#111827]">
-          Funil de Convers{"\u00e3"}o
+          Funil de Conversão
         </h2>
         <FunnelChart data={funnel} />
       </Card>

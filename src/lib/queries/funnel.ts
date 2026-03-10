@@ -45,8 +45,8 @@ export async function getFunnelData(period?: DateRange): Promise<FunnelStage[]> 
   const pct = (v: number) => Math.round((v / total) * 100 * 10) / 10
 
   return [
-    { stage: "Formul\u00e1rios", count: total, percentage: 100, color: "#6366f1" },
-    { stage: "CNPJ V\u00e1lido", count: cnpjValid, percentage: pct(cnpjValid), color: "#8b5cf6" },
+    { stage: "Formulários", count: total, percentage: 100, color: "#6366f1" },
+    { stage: "CNPJ Válido", count: cnpjValid, percentage: pct(cnpjValid), color: "#8b5cf6" },
     { stage: "Distribuidor (P2)", count: path2, percentage: pct(path2), color: "#f59e0b" },
     { stage: "Qualificado (P3)", count: path3, percentage: pct(path3), color: "#10b981" },
     { stage: "Contatado", count: contacted, percentage: pct(contacted), color: "#3b82f6" },

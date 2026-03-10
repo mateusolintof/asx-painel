@@ -5,7 +5,7 @@ import { NAV_ITEMS } from "@/lib/utils/constants"
 import { MobileSidebar } from "@/components/dashboard/sidebar"
 
 const PAGE_TITLES: Record<string, string> = {
-  "/": "Vis\u00e3o Geral",
+  "/": "Visão Geral",
   "/leads": "Leads",
   "/funil": "Funil",
   "/vendedores": "Vendedores",

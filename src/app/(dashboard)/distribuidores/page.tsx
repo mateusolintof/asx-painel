@@ -88,10 +88,10 @@ export default async function DistribuidoresPage({ searchParams }: Props) {
                   Tipo
                 </TableHead>
                 <TableHead className="text-right text-xs font-medium uppercase tracking-wider text-[#6B7280]">
-                  Recomenda\u00e7\u00f5es
+                  Recomendações
                 </TableHead>
                 <TableHead className="text-xs font-medium uppercase tracking-wider text-[#6B7280]">
-                  \u00daltima
+                  Última
                 </TableHead>
               </TableRow>
             </TableHeader>
@@ -102,7 +102,7 @@ export default async function DistribuidoresPage({ searchParams }: Props) {
                     colSpan={6}
                     className="py-8 text-center text-sm text-[#6B7280]"
                   >
-                    Nenhuma recomenda\u00e7\u00e3o registrada
+                    Nenhuma recomendação registrada
                   </TableCell>
                 </TableRow>
               ) : (
@@ -126,7 +126,7 @@ export default async function DistribuidoresPage({ searchParams }: Props) {
                     <TableCell className="text-sm text-[#6B7280]">
                       {dist.lastRecommendedAt
                         ? formatDate(dist.lastRecommendedAt)
-                        : "\u2014"}
+                        : "—"}
                     </TableCell>
                   </TableRow>
                 ))

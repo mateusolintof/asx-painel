@@ -1,7 +1,6 @@
 "use client"
 
 import { useState } from "react"
-import { useRouter } from "next/navigation"
 import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -13,7 +12,6 @@ export default function LoginPage() {
   const [password, setPassword] = useState("")
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
-  const router = useRouter()
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -32,8 +30,7 @@ export default function LoginPage() {
       return
     }
 
-    router.refresh()
-    router.push("/")
+    window.location.href = "/"
   }
 
   return (
@@ -43,7 +40,7 @@ export default function LoginPage() {
           <span className="text-[#B2121A]">ASX</span> Painel
         </h1>
         <p className="mt-1 text-sm text-[#6B7280]">
-          Gest\u00e3o de Leads
+          Gestão de Leads
         </p>
       </div>
 
@@ -71,7 +68,7 @@ export default function LoginPage() {
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            placeholder="\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022"
+            placeholder="••••••••"
             required
           />
         </div>

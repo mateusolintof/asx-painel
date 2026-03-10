@@ -19,7 +19,7 @@ export function TrendLine({ data }: TrendLineProps) {
   if (data.length === 0) {
     return (
       <div className="flex h-64 items-center justify-center text-sm text-[#6B7280]">
-        Sem dados de tend\u00eancia
+        Sem dados de tendência
       </div>
     )
   }

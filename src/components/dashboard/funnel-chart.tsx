@@ -19,7 +19,7 @@ export function FunnelChart({ data }: FunnelChartProps) {
   if (data.length === 0) {
     return (
       <div className="flex h-64 items-center justify-center text-sm text-[#6B7280]">
-        Sem dados para o per\u00edodo selecionado
+        Sem dados para o período selecionado
       </div>
     )
   }

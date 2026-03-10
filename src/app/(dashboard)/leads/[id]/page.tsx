@@ -37,7 +37,7 @@ export default async function LeadDetailPage({ params }: Props) {
         <div>
           <h2 className="text-xl font-semibold text-[#111827]">{fbLead.nome}</h2>
           <p className="mt-1 text-sm text-[#6B7280]">
-            {fbLead.nome_fantasia ?? fbLead.razao_social ?? "Empresa n\u00e3o identificada"}
+            {fbLead.nome_fantasia ?? fbLead.razao_social ?? "Empresa não identificada"}
           </p>
         </div>
         <div className="flex gap-2">
@@ -53,12 +53,12 @@ export default async function LeadDetailPage({ params }: Props) {
             <h3 className="mb-4 text-base font-medium text-[#111827]">Dados do Lead</h3>
             <div className="grid grid-cols-2 gap-4 text-sm">
               <Detail label="Telefone" value={formatPhone(fbLead.telefone)} />
-              <Detail label="Email" value={fbLead.email ?? "\u2014"} />
-              <Detail label="CNPJ" value={fbLead.cnpj ? formatCNPJ(fbLead.cnpj) : "\u2014"} />
+              <Detail label="Email" value={fbLead.email ?? "—"} />
+              <Detail label="CNPJ" value={fbLead.cnpj ? formatCNPJ(fbLead.cnpj) : "—"} />
               <Detail label="Estado" value={fbLead.estado_envio} />
               <Detail label="Perfil" value={fbLead.perfil} />
               <Detail label="Volume" value={fbLead.volume_faixa} />
-              <Detail label="Path" value={`${fbLead.path} \u2014 ${fbLead.path_reason ?? ""}`} />
+              <Detail label="Path" value={`${fbLead.path} — ${fbLead.path_reason ?? ""}`} />
               <Detail label="Criado em" value={formatDateTime(fbLead.created_at)} />
             </div>
 
@@ -69,9 +69,9 @@ export default async function LeadDetailPage({ params }: Props) {
                   Dados da Receita Federal
                 </h4>
                 <div className="grid grid-cols-2 gap-4 text-sm">
-                  <Detail label="Raz\u00e3o Social" value={fbLead.razao_social ?? "\u2014"} />
-                  <Detail label="Nome Fantasia" value={fbLead.nome_fantasia ?? "\u2014"} />
-                  <Detail label="CNAE" value={fbLead.cnae ?? "\u2014"} />
+                  <Detail label="Razão Social" value={fbLead.razao_social ?? "—"} />
+                  <Detail label="Nome Fantasia" value={fbLead.nome_fantasia ?? "—"} />
+                  <Detail label="CNAE" value={fbLead.cnae ?? "—"} />
                   <Detail label="Cidade/UF" value={`${fbLead.cnpj_city ?? ""} / ${fbLead.cnpj_state ?? ""}`} />
                 </div>
               </>
@@ -82,7 +82,7 @@ export default async function LeadDetailPage({ params }: Props) {
           {qualifiedLead && (
             <Card className="border bg-white p-6">
               <h3 className="mb-4 text-base font-medium text-[#111827]">
-                Qualifica\u00e7\u00e3o & Handoff
+                Qualificação & Handoff
               </h3>
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>
@@ -95,16 +95,16 @@ export default async function LeadDetailPage({ params }: Props) {
                   </div>
                 </div>
                 <Detail
-                  label="J\u00e1 compra ASX?"
-                  value={qualifiedLead.ja_compra_asx_regiao === "sim" ? "Sim" : "N\u00e3o"}
+                  label="Já compra ASX?"
+                  value={qualifiedLead.ja_compra_asx_regiao === "sim" ? "Sim" : "Não"}
                 />
                 <Detail
                   label="NFs enviadas?"
-                  value={qualifiedLead.nfs_enviadas ? "Sim" : "N\u00e3o"}
+                  value={qualifiedLead.nfs_enviadas ? "Sim" : "Não"}
                 />
                 <Detail
                   label="Empresa recente?"
-                  value={qualifiedLead.empresa_recente ? "Sim" : "N\u00e3o"}
+                  value={qualifiedLead.empresa_recente ? "Sim" : "Não"}
                 />
                 {seller && (
                   <Detail label="Vendedor" value={seller.name} />

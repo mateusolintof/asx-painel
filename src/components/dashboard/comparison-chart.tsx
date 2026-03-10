@@ -18,8 +18,8 @@ interface ComparisonChartProps {
 export function ComparisonChart({ data }: ComparisonChartProps) {
   const chartData = data.map((d) => ({
     name: d.label,
-    "Per\u00edodo A": d.periodA,
-    "Per\u00edodo B": d.periodB,
+    "Período A": d.periodA,
+    "Período B": d.periodB,
   }))
 
   return (
@@ -48,8 +48,8 @@ export function ComparisonChart({ data }: ComparisonChartProps) {
           iconSize={8}
           wrapperStyle={{ fontSize: 12, color: "#6B7280" }}
         />
-        <Bar dataKey="Per\u00edodo A" fill="#B2121A" radius={[4, 4, 0, 0]} barSize={24} />
-        <Bar dataKey="Per\u00edodo B" fill="#B2121A" fillOpacity={0.3} radius={[4, 4, 0, 0]} barSize={24} />
+        <Bar dataKey="Período A" fill="#B2121A" radius={[4, 4, 0, 0]} barSize={24} />
+        <Bar dataKey="Período B" fill="#B2121A" fillOpacity={0.3} radius={[4, 4, 0, 0]} barSize={24} />
       </BarChart>
     </ResponsiveContainer>
   )

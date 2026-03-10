@@ -8,8 +8,8 @@ const inter = Inter({
 })
 
 export const metadata: Metadata = {
-  title: "ASX Painel | Gest\u00e3o de Leads",
-  description: "Painel de gest\u00e3o comercial da ASX Ilumina\u00e7\u00e3o Automotiva",
+  title: "ASX Painel | Gestão de Leads",
+  description: "Painel de gestão comercial da ASX Iluminação Automotiva",
 }
 
 export default function RootLayout({

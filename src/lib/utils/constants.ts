@@ -15,8 +15,8 @@ export const STATUS_LABELS: Record<string, string> = {
   contacted: "Contatado",
   in_conversation: "Em conversa",
   handoff_done: "Transferido",
-  disqualified_cnpj: "CNPJ inv\u00e1lido",
-  disqualified_policy: "Pol\u00edtica interna",
+  disqualified_cnpj: "CNPJ inválido",
+  disqualified_policy: "Política interna",
   send_failed: "Falha no envio",
 }
 
@@ -45,7 +45,7 @@ export const SCORE_COLORS: Record<string, string> = {
 export const PRIORITY_LABELS: Record<string, string> = {
   urgent: "Urgente",
   high: "Alta",
-  medium: "M\u00e9dia",
+  medium: "Média",
 }
 
 export const NNE_STATES = [
@@ -66,7 +66,7 @@ export const SELLERS = [
 ]
 
 export const NAV_ITEMS = [
-  { label: "Vis\u00e3o Geral", href: "/", icon: "LayoutDashboard" },
+  { label: "Visão Geral", href: "/", icon: "LayoutDashboard" },
   { label: "Leads", href: "/leads", icon: "Users" },
   { label: "Funil", href: "/funil", icon: "Filter" },
   { label: "Vendedores", href: "/vendedores", icon: "UserCheck" },

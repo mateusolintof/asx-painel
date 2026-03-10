@@ -29,7 +29,7 @@ export default async function LeadsQuentesPage() {
         <div className="flex items-center gap-3 rounded-lg border border-red-200 bg-red-50 px-4 py-3">
           <AlertTriangle className="h-5 w-5 text-[#B2121A]" />
           <p className="text-sm font-medium text-[#B2121A]">
-            {stale.length} lead{stale.length > 1 ? "s" : ""} sem atividade h\u00e1
+            {stale.length} lead{stale.length > 1 ? "s" : ""} sem atividade há
             mais de 24h
           </p>
         </div>
@@ -133,7 +133,7 @@ export default async function LeadsQuentesPage() {
                         </Link>
                       </TableCell>
                       <TableCell className="text-sm text-[#6B7280]">
-                        {lead.empresa ?? "\u2014"}
+                        {lead.empresa ?? "—"}
                       </TableCell>
                       <TableCell className="text-sm text-[#6B7280]">
                         {lead.estado}
@@ -145,7 +145,7 @@ export default async function LeadsQuentesPage() {
                             score={lead.score ?? undefined}
                           />
                         ) : (
-                          <span className="text-sm text-[#9CA3AF]">\u2014</span>
+                          <span className="text-sm text-[#9CA3AF]">—</span>
                         )}
                       </TableCell>
                       <TableCell>

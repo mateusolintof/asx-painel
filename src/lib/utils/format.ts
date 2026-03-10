@@ -34,7 +34,7 @@ export function formatPercent(value: number): string {
 
 export function formatDate(dateStr: string): string {
   const d = new Date(dateStr)
-  if (isNaN(d.getTime())) return "\u2014"
+  if (isNaN(d.getTime())) return "—"
   return new Intl.DateTimeFormat("pt-BR", {
     day: "2-digit",
     month: "2-digit",
@@ -44,7 +44,7 @@ export function formatDate(dateStr: string): string {
 
 export function formatDateTime(dateStr: string): string {
   const d = new Date(dateStr)
-  if (isNaN(d.getTime())) return "\u2014"
+  if (isNaN(d.getTime())) return "—"
   return new Intl.DateTimeFormat("pt-BR", {
     day: "2-digit",
     month: "2-digit",
@@ -63,9 +63,9 @@ export function formatRelativeTime(dateStr: string): string {
   const diffDays = Math.floor(diffMs / 86400000)
 
   if (diffMins < 1) return "agora"
-  if (diffMins < 60) return `${diffMins}min atr\u00e1s`
-  if (diffHours < 24) return `${diffHours}h atr\u00e1s`
-  if (diffDays < 7) return `${diffDays}d atr\u00e1s`
+  if (diffMins < 60) return `${diffMins}min atrás`
+  if (diffHours < 24) return `${diffHours}h atrás`
+  if (diffDays < 7) return `${diffDays}d atrás`
   return formatDate(dateStr)
 }
 

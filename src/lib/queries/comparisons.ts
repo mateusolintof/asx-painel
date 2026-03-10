@@ -54,7 +54,7 @@ export async function comparePeriods(
       format: "percent",
     },
     {
-      label: "Score M\u00e9dio",
+      label: "Score Médio",
       periodA: statsA.avgScore,
       periodB: statsB.avgScore,
       delta: delta(statsA.avgScore, statsB.avgScore),

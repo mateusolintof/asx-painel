@@ -91,7 +91,7 @@ export function DateRangePicker({ className }: DateRangePickerProps) {
         {date?.from ? (
           date.to ? (
             <span className="text-sm text-[#111827]">
-              {format(date.from, "dd/MM/yy", { locale: ptBR })} —{" "}
+              {format(date.from, "dd/MM/yy", { locale: ptBR })} — 
               {format(date.to, "dd/MM/yy", { locale: ptBR })}
             </span>
           ) : (

@@ -81,8 +81,8 @@ export function LeadTable({ leads, total, page, totalPages }: LeadTableProps) {
           <option value="contacted">Contatado</option>
           <option value="in_conversation">Em conversa</option>
           <option value="handoff_done">Transferido</option>
-          <option value="disqualified_cnpj">CNPJ inv\u00e1lido</option>
-          <option value="disqualified_policy">Pol\u00edtica interna</option>
+          <option value="disqualified_cnpj">CNPJ inválido</option>
+          <option value="disqualified_policy">Política interna</option>
           <option value="send_failed">Falha no envio</option>
         </select>
       </div>
@@ -133,7 +133,7 @@ export function LeadTable({ leads, total, page, totalPages }: LeadTableProps) {
                     {lead.nome}
                   </TableCell>
                   <TableCell className="text-sm text-[#6B7280]">
-                    {lead.nome_fantasia ?? lead.razao_social ?? "\u2014"}
+                    {lead.nome_fantasia ?? lead.razao_social ?? "—"}
                   </TableCell>
                   <TableCell className="text-sm text-[#6B7280]">
                     {lead.estado_envio}

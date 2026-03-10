@@ -21,8 +21,8 @@ function getPresetPeriods(preset: string) {
     return {
       periodA: { from: thisMonthStart.toISOString(), to: now.toISOString() },
       periodB: { from: lastMonthStart.toISOString(), to: lastMonthEnd.toISOString() },
-      labelA: "Este m\u00eas",
-      labelB: "M\u00eas passado",
+      labelA: "Este mês",
+      labelB: "Mês passado",
     }
   }
 
@@ -55,7 +55,7 @@ export default async function ComparativosPage({ searchParams }: Props) {
       <div className="flex gap-2">
         {[
           { key: "week", label: "Semana" },
-          { key: "month", label: "M\u00eas" },
+          { key: "month", label: "Mês" },
         ].map((p) => (
           <Link
             key={p.key}
@@ -73,7 +73,7 @@ export default async function ComparativosPage({ searchParams }: Props) {
       </div>
 
       <p className="text-sm text-[#6B7280]">
-        Comparando <span className="font-medium text-[#111827]">{labelA}</span> vs{" "}
+        Comparando <span className="font-medium text-[#111827]">{labelA}</span> vs 
         <span className="font-medium text-[#111827]">{labelB}</span>
       </p>
 
@@ -90,7 +90,7 @@ export default async function ComparativosPage({ searchParams }: Props) {
                     : formatNumber(metric.periodA)}
                 </p>
                 <p className="text-xs text-[#9CA3AF]">
-                  vs{" "}
+                  vs 
                   {metric.format === "percent"
                     ? formatPercent(metric.periodB)
                     : formatNumber(metric.periodB)}
@@ -118,7 +118,7 @@ export default async function ComparativosPage({ searchParams }: Props) {
       {/* Chart */}
       <Card className="border bg-white p-6">
         <h2 className="mb-4 text-base font-medium text-[#111827]">
-          Compara\u00e7\u00e3o Visual
+          Comparação Visual
         </h2>
         <ComparisonChart data={metrics} />
       </Card>

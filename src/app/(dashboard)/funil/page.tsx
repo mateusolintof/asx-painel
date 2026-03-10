@@ -43,7 +43,7 @@ export default async function FunilPage({ searchParams }: Props) {
       {/* Funnel Chart */}
       <Card className="border bg-white p-6">
         <h2 className="mb-4 text-base font-medium text-[#111827]">
-          Funil de Convers{"\u00e3"}o
+          Funil de Conversão
         </h2>
         <FunnelChart data={funnel} />
       </Card>
@@ -52,7 +52,7 @@ export default async function FunilPage({ searchParams }: Props) {
       {funnel.length > 0 && (
         <Card className="border bg-white p-6">
           <h2 className="mb-4 text-base font-medium text-[#111827]">
-            Taxas de Convers{"\u00e3"}o
+            Taxas de Conversão
           </h2>
           <div className="space-y-3">
             {funnel.slice(1).map((stage, i) => {
@@ -61,7 +61,7 @@ export default async function FunilPage({ searchParams }: Props) {
               return (
                 <div key={stage.stage} className="flex items-center gap-4">
                   <span className="w-40 shrink-0 text-sm text-[#6B7280]">
-                    {funnel[i].stage} {"\u2192"} {stage.stage}
+                    {funnel[i].stage} {"→"} {stage.stage}
                   </span>
                   <div className="flex-1">
                     <div className="h-2 overflow-hidden rounded-full bg-[#F3F4F6]">

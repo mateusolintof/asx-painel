@@ -34,7 +34,7 @@ export default async function VendedoresPage() {
                 </p>
               </div>
               <div>
-                <p className="text-sm text-[#6B7280]">Score M\u00e9dio</p>
+                <p className="text-sm text-[#6B7280]">Score Médio</p>
                 <p className="mt-1 text-2xl font-semibold text-[#111827]">
                   {seller.avgScore}
                 </p>
@@ -43,7 +43,7 @@ export default async function VendedoresPage() {
 
             {/* Score Distribution Bar */}
             <div className="mt-4">
-              <p className="mb-2 text-xs text-[#6B7280]">Distribui\u00e7\u00e3o por Score</p>
+              <p className="mb-2 text-xs text-[#6B7280]">Distribuição por Score</p>
               {seller.totalLeads > 0 ? (
                 <div className="flex h-3 overflow-hidden rounded-full">
                   {seller.scoreDistribution.map((sd) => {
@@ -88,7 +88,7 @@ export default async function VendedoresPage() {
 
             {seller.latestAssignment && (
               <p className="mt-4 text-xs text-[#9CA3AF]">
-                \u00daltimo lead: {formatRelativeTime(seller.latestAssignment)}
+                Último lead: {formatRelativeTime(seller.latestAssignment)}
               </p>
             )}
           </Card>

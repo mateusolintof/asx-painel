@@ -31,7 +31,7 @@ export async function getKPIs(current: DateRange, previous: DateRange): Promise<
       format: "percent",
     },
     {
-      label: "Score M\u00e9dio",
+      label: "Score Médio",
       value: currentData.avgScore,
       previousValue: previousData.avgScore,
       format: "number",
