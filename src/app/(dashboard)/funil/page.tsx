@@ -28,54 +28,58 @@ export default async function FunilPage({ searchParams }: Props) {
       </div>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-4 lg:grid-cols-7">
-        {funnel.map((stage) => (
-          <Card key={stage.stage} className="border bg-white p-4">
-            <p className="text-xs text-[#6B7280]">{stage.stage}</p>
-            <p className="mt-1 text-2xl font-semibold text-[#111827]">
-              {formatNumber(stage.count)}
-            </p>
-            <p className="text-xs text-[#9CA3AF]">{formatPercent(stage.percentage)}</p>
-          </Card>
-        ))}
-      </div>
+      {funnel.summary.length > 0 ? (
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-4 lg:grid-cols-7">
+          {funnel.summary.map((stage) => (
+            <Card key={stage.stage} className="border bg-white p-4">
+              <p className="text-xs text-[#6B7280]">{stage.stage}</p>
+              <p className="mt-1 text-2xl font-semibold text-[#111827]">
+                {formatNumber(stage.count)}
+              </p>
+              <p className="text-xs text-[#9CA3AF]">{formatPercent(stage.percentage)}</p>
+            </Card>
+          ))}
+        </div>
+      ) : null}
 
       {/* Funnel Chart */}
       <Card className="border bg-white p-6">
         <h2 className="mb-4 text-base font-medium text-[#111827]">
-          Funil de Conversão
+          Funil Principal (Path 3)
         </h2>
-        <FunnelChart data={funnel} />
+        <p className="mb-4 text-sm text-[#6B7280]">
+          O Path 2 aparece nos cards acima como desvio operacional, mas fica
+          fora do funil principal porque nao segue para qualificacao e handoff.
+        </p>
+        <FunnelChart data={funnel.chart} />
       </Card>
 
       {/* Conversion Rates */}
-      {funnel.length > 0 && (
+      {funnel.conversions.length > 0 && (
         <Card className="border bg-white p-6">
           <h2 className="mb-4 text-base font-medium text-[#111827]">
             Taxas de Conversão
           </h2>
           <div className="space-y-3">
-            {funnel.slice(1).map((stage, i) => {
-              const prevCount = funnel[i].count
-              const rate = prevCount > 0 ? (stage.count / prevCount) * 100 : 0
+            {funnel.conversions.map((step) => {
               return (
-                <div key={stage.stage} className="flex items-center gap-4">
+                <div key={step.label} className="flex items-center gap-4">
                   <span className="w-40 shrink-0 text-sm text-[#6B7280]">
-                    {funnel[i].stage} {"→"} {stage.stage}
+                    {step.label}
                   </span>
                   <div className="flex-1">
                     <div className="h-2 overflow-hidden rounded-full bg-[#F3F4F6]">
                       <div
                         className="h-full rounded-full transition-all"
                         style={{
-                          width: `${Math.min(rate, 100)}%`,
-                          backgroundColor: stage.color,
+                          width: `${Math.min(step.rate, 100)}%`,
+                          backgroundColor: step.color,
                         }}
                       />
                     </div>
                   </div>
                   <span className="w-16 text-right text-sm font-medium text-[#111827]">
-                    {formatPercent(rate)}
+                    {formatPercent(step.rate)}
                   </span>
                 </div>
               )

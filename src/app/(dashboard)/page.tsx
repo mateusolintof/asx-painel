@@ -1,3 +1,4 @@
+import { endOfDay, startOfDay, subDays } from "date-fns"
 import { Card } from "@/components/ui/card"
 import { KPICard } from "@/components/dashboard/kpi-card"
 import { FunnelChart } from "@/components/dashboard/funnel-chart"
@@ -12,10 +13,8 @@ interface Props {
 }
 
 function getDateRange(daysAgo: number, length: number) {
-  const to = new Date()
-  to.setDate(to.getDate() - daysAgo)
-  const from = new Date(to)
-  from.setDate(from.getDate() - length)
+  const to = endOfDay(subDays(new Date(), daysAgo))
+  const from = startOfDay(subDays(to, length - 1))
   return {
     from: from.toISOString(),
     to: to.toISOString(),
@@ -35,10 +34,16 @@ export default async function OverviewPage({ searchParams }: Props) {
     : 30
 
   const previous = hasCustomRange
-    ? {
-        from: new Date(new Date(params.from!).getTime() - daysInRange * 86400000).toISOString(),
-        to: params.from!,
-      }
+    ? (() => {
+        const currentFrom = new Date(params.from!)
+        const previousTo = new Date(currentFrom.getTime() - 1)
+        const previousFrom = startOfDay(subDays(previousTo, daysInRange - 1))
+
+        return {
+          from: previousFrom.toISOString(),
+          to: endOfDay(previousTo).toISOString(),
+        }
+      })()
     : getDateRange(30, 30)
 
   const [kpis, trend, funnel, pathDist] = await Promise.all([
@@ -94,9 +99,9 @@ export default async function OverviewPage({ searchParams }: Props) {
       {/* Funnel */}
       <Card className="border bg-white p-6">
         <h2 className="mb-4 text-base font-medium text-[#111827]">
-          Funil de Conversão
+          Funil Principal (Path 3)
         </h2>
-        <FunnelChart data={funnel} />
+        <FunnelChart data={funnel.chart} />
       </Card>
     </div>
   )

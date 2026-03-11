@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server"
 import type { DateRange } from "@/lib/types/database"
+import { throwQueryError } from "@/lib/queries/errors"
 
 export interface ComparisonMetric {
   label: string
@@ -79,16 +80,15 @@ async function getPeriodAggregates(period: DateRange) {
     .gte("created_at", period.from)
     .lte("created_at", period.to)
 
-  if (leadsErr) {
-    console.error(`Failed to fetch comparison data: ${leadsErr.message}`)
-    return { total: 0, qualified: 0, handoff: 0, disqualified: 0, avgScore: 0 }
-  }
+  throwQueryError("Falha ao carregar comparativo de leads", leadsErr)
 
-  const { data: scored } = await supabase
+  const { data: scored, error: scoresErr } = await supabase
     .from("leads")
     .select("score")
     .gte("qualified_at", period.from)
     .lte("qualified_at", period.to)
+
+  throwQueryError("Falha ao carregar comparativo de scores", scoresErr)
 
   const rows = leads ?? []
   const scores = scored ?? []
@@ -121,6 +121,9 @@ export async function getTrendComparison(periodA: DateRange, periodB: DateRange)
       .lte("day", periodB.to)
       .order("day", { ascending: true }),
   ])
+
+  throwQueryError("Falha ao carregar tendencia do periodo A", dataA.error)
+  throwQueryError("Falha ao carregar tendencia do periodo B", dataB.error)
 
   return {
     periodA: dataA.data ?? [],

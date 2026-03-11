@@ -1,3 +1,4 @@
+import { endOfDay, startOfDay } from "date-fns"
 import Link from "next/link"
 import { Card } from "@/components/ui/card"
 import { ComparisonChart } from "@/components/dashboard/comparison-chart"
@@ -19,8 +20,14 @@ function getPresetPeriods(preset: string) {
     const lastMonthStart = new Date(today.getFullYear(), today.getMonth() - 1, 1)
     const lastMonthEnd = new Date(today.getFullYear(), today.getMonth(), 0)
     return {
-      periodA: { from: thisMonthStart.toISOString(), to: now.toISOString() },
-      periodB: { from: lastMonthStart.toISOString(), to: lastMonthEnd.toISOString() },
+      periodA: {
+        from: startOfDay(thisMonthStart).toISOString(),
+        to: now.toISOString(),
+      },
+      periodB: {
+        from: startOfDay(lastMonthStart).toISOString(),
+        to: endOfDay(lastMonthEnd).toISOString(),
+      },
       labelA: "Este mês",
       labelB: "Mês passado",
     }
@@ -35,8 +42,14 @@ function getPresetPeriods(preset: string) {
   lastWeekEnd.setDate(lastWeekEnd.getDate() - 1)
 
   return {
-    periodA: { from: thisWeekStart.toISOString(), to: now.toISOString() },
-    periodB: { from: lastWeekStart.toISOString(), to: lastWeekEnd.toISOString() },
+    periodA: {
+      from: startOfDay(thisWeekStart).toISOString(),
+      to: now.toISOString(),
+    },
+    periodB: {
+      from: startOfDay(lastWeekStart).toISOString(),
+      to: endOfDay(lastWeekEnd).toISOString(),
+    },
     labelA: "Esta semana",
     labelB: "Semana passada",
   }
@@ -73,7 +86,7 @@ export default async function ComparativosPage({ searchParams }: Props) {
       </div>
 
       <p className="text-sm text-[#6B7280]">
-        Comparando <span className="font-medium text-[#111827]">{labelA}</span> vs 
+        Comparando <span className="font-medium text-[#111827]">{labelA}</span> vs{" "}
         <span className="font-medium text-[#111827]">{labelB}</span>
       </p>
 
@@ -90,7 +103,7 @@ export default async function ComparativosPage({ searchParams }: Props) {
                     : formatNumber(metric.periodA)}
                 </p>
                 <p className="text-xs text-[#9CA3AF]">
-                  vs 
+                  vs{" "}
                   {metric.format === "percent"
                     ? formatPercent(metric.periodB)
                     : formatNumber(metric.periodB)}

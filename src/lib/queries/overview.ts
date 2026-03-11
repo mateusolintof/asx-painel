@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server"
 import type { DateRange, KPI } from "@/lib/types/database"
+import { throwQueryError } from "@/lib/queries/errors"
 
 export async function getKPIs(current: DateRange, previous: DateRange): Promise<KPI[]> {
   const [currentData, previousData] = await Promise.all([
@@ -48,16 +49,15 @@ async function getPeriodStats(period: DateRange) {
     .gte("created_at", period.from)
     .lte("created_at", period.to)
 
-  if (leadsErr) {
-    console.error(`Failed to fetch leads: ${leadsErr.message}`)
-    return { total: 0, qualified: 0, handoff: 0, avgScore: 0 }
-  }
+  throwQueryError("Falha ao carregar KPIs de leads", leadsErr)
 
-  const { data: qualifiedLeads } = await supabase
+  const { data: qualifiedLeads, error: qualifiedErr } = await supabase
     .from("leads")
     .select("score")
     .gte("qualified_at", period.from)
     .lte("qualified_at", period.to)
+
+  throwQueryError("Falha ao carregar scores para KPIs", qualifiedErr)
 
   const rows = leads ?? []
   const scored = qualifiedLeads ?? []
@@ -92,10 +92,7 @@ export async function getTrendData(period?: DateRange) {
 
   const { data, error } = await query
 
-  if (error) {
-    console.error(`Failed to fetch trend data: ${error.message}`)
-    return []
-  }
+  throwQueryError("Falha ao carregar tendencia do funil", error)
   return data ?? []
 }
 
@@ -112,10 +109,7 @@ export async function getPathDistribution(period?: DateRange) {
 
   const { data, error } = await query
 
-  if (error) {
-    console.error(`Failed to fetch path distribution: ${error.message}`)
-    return []
-  }
+  throwQueryError("Falha ao carregar distribuicao por path", error)
 
   const rows = data ?? []
   return [

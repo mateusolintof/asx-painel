@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server"
+import { throwQueryError } from "@/lib/queries/errors"
 
 export interface HotLead {
   fb_lead_id: string
@@ -29,19 +30,18 @@ export async function getHotLeads(): Promise<HotLead[]> {
     .in("status", ["contacted", "in_conversation"])
     .order("created_at", { ascending: true })
 
-  if (fbErr) {
-    console.error(`Failed to fetch hot leads: ${fbErr.message}`)
-    return []
-  }
+  throwQueryError("Falha ao carregar leads quentes", fbErr)
   if (!fbLeads || fbLeads.length === 0) return []
 
   const phones = fbLeads.map((fl) => fl.telefone)
 
   // 2. Batch: buscar todos os contatos por telefone
-  const { data: contacts } = await supabase
+  const { data: contacts, error: contactsErr } = await supabase
     .from("contacts")
     .select("id, phone")
     .in("phone", phones)
+
+  throwQueryError("Falha ao carregar contatos dos leads quentes", contactsErr)
 
   const contactMap = new Map(
     (contacts ?? []).map((c) => [c.phone, c.id])
@@ -52,10 +52,12 @@ export async function getHotLeads(): Promise<HotLead[]> {
   const leadMap = new Map<string, { id: string; score: number; class: string; priority: string }>()
 
   if (contactIds.length > 0) {
-    const { data: leads } = await supabase
+    const { data: leads, error: leadsErr } = await supabase
       .from("leads")
       .select("id, contact_id, score, class, priority")
       .in("contact_id", contactIds)
+
+    throwQueryError("Falha ao carregar qualificacao dos leads quentes", leadsErr)
 
     for (const lead of leads ?? []) {
       leadMap.set(String(lead.contact_id), lead)
@@ -67,10 +69,12 @@ export async function getHotLeads(): Promise<HotLead[]> {
   const assignmentMap = new Map<string, string>()
 
   if (leadIds.length > 0) {
-    const { data: assignments } = await supabase
+    const { data: assignments, error: assignmentsErr } = await supabase
       .from("assignments")
       .select("lead_id, assignee_id")
       .in("lead_id", leadIds)
+
+    throwQueryError("Falha ao carregar atribuicoes dos leads quentes", assignmentsErr)
 
     for (const a of assignments ?? []) {
       assignmentMap.set(String(a.lead_id), String(a.assignee_id))
@@ -82,10 +86,12 @@ export async function getHotLeads(): Promise<HotLead[]> {
   const agentMap = new Map<string, string>()
 
   if (agentIds.length > 0) {
-    const { data: agents } = await supabase
+    const { data: agents, error: agentsErr } = await supabase
       .from("agents")
       .select("id, name")
       .in("id", agentIds)
+
+    throwQueryError("Falha ao carregar vendedores dos leads quentes", agentsErr)
 
     for (const ag of agents ?? []) {
       agentMap.set(String(ag.id), ag.name)
@@ -93,11 +99,13 @@ export async function getHotLeads(): Promise<HotLead[]> {
   }
 
   // 6. Batch: buscar ultima mensagem por telefone
-  const { data: allMessages } = await supabase
+  const { data: allMessages, error: messagesErr } = await supabase
     .from("ia_messages")
     .select("phone, created_at")
     .in("phone", phones)
     .order("created_at", { ascending: false })
+
+  throwQueryError("Falha ao carregar mensagens dos leads quentes", messagesErr)
 
   const lastMsgMap = new Map<string, string>()
   for (const msg of allMessages ?? []) {

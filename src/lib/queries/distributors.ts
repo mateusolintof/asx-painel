@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server"
+import { throwQueryError } from "@/lib/queries/errors"
 
 export interface DistributorStats {
   id: number
@@ -19,19 +20,14 @@ export async function getDistributorStats(estado?: string) {
     .select("*", { count: "exact", head: true })
     .eq("path", 2)
 
-  if (countErr) {
-    console.error(`Failed to fetch redirect count: ${countErr.message}`)
-  }
+  throwQueryError("Falha ao carregar total de redirecionamentos", countErr)
 
   // Get all recommendations with distributor data
   const { data: recommendations, error: recErr } = await supabase
     .from("distributor_recommendations")
-    .select("distributor_id, recommended_at, distributors(id, razao_social, cidade, estado_uf, tipo_representantes)")
+    .select("distributor_id, recommended_at, distributors(id, razao_social, cidade, estado_uf, tipo)")
 
-  if (recErr) {
-    console.error(`Failed to fetch recommendations: ${recErr.message}`)
-    return { totalRedirections: totalRedirections ?? 0, uniqueDistributors: 0, distributors: [], availableStates: [] }
-  }
+  throwQueryError("Falha ao carregar recomendacoes de distribuidores", recErr)
 
   // Aggregate by distributor
   const distributorMap = new Map<number, DistributorStats>()
@@ -42,7 +38,7 @@ export async function getDistributorStats(estado?: string) {
       razao_social: string
       cidade: string
       estado_uf: string
-      tipo_representantes: string
+      tipo: string
     }
     if (!dist) continue
 
@@ -60,7 +56,7 @@ export async function getDistributorStats(estado?: string) {
         razao_social: dist.razao_social,
         cidade: dist.cidade,
         estado_uf: dist.estado_uf,
-        tipo: dist.tipo_representantes,
+        tipo: dist.tipo,
         timesRecommended: 1,
         lastRecommendedAt: rec.recommended_at,
       })
@@ -74,10 +70,12 @@ export async function getDistributorStats(estado?: string) {
   const uniqueDistributors = distributors.length
 
   // Available states for filter
-  const { data: states } = await supabase
+  const { data: states, error: statesErr } = await supabase
     .from("distributors")
     .select("estado_uf")
     .eq("status", "ATIVADO")
+
+  throwQueryError("Falha ao carregar estados de distribuidores", statesErr)
 
   const uniqueStates = [...new Set((states ?? []).map((s) => s.estado_uf))].sort()
 

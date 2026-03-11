@@ -90,7 +90,7 @@ export interface Distributor {
   pais: string
   telefone: string | null
   status: string
-  tipo_representantes: string
+  tipo: string
   lat: number | null
   lng: number | null
 }

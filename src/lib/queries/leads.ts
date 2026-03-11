@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server"
 import type { FbLead, LeadFilters } from "@/lib/types/database"
+import { throwQueryError } from "@/lib/queries/errors"
 
 const PAGE_SIZE = 20
 
@@ -46,10 +47,7 @@ export async function getLeads(filters: LeadFilters = {}) {
 
   const { data, count, error } = await query
 
-  if (error) {
-    console.error(`Failed to fetch leads: ${error.message}`)
-    return { leads: [] as FbLead[], total: 0, page, pageSize, totalPages: 0 }
-  }
+  throwQueryError("Falha ao carregar lista de leads", error)
 
   return {
     leads: (data ?? []) as FbLead[],
@@ -69,47 +67,56 @@ export async function getLeadById(id: string) {
     .eq("id", id)
     .single()
 
+  throwQueryError("Falha ao carregar lead", fbErr)
   if (fbErr || !fbLead) return null
 
   // Buscar contato pelo telefone
-  const { data: contact } = await supabase
+  const { data: contact, error: contactErr } = await supabase
     .from("contacts")
     .select("id")
     .eq("phone", fbLead.telefone)
     .maybeSingle()
 
+  throwQueryError("Falha ao carregar contato do lead", contactErr)
+
   // Buscar lead qualificado (se existir contato)
   let qualifiedLead = null
   if (contact?.id) {
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from("leads")
       .select("*, assignments(*)")
       .eq("contact_id", contact.id)
       .maybeSingle()
+    throwQueryError("Falha ao carregar qualificacao do lead", error)
     qualifiedLead = data
   }
 
   // Buscar mensagens
-  const { data: messages } = await supabase
+  const { data: messages, error: messagesErr } = await supabase
     .from("ia_messages")
     .select("*")
     .eq("phone", fbLead.telefone)
     .order("created_at", { ascending: true })
 
+  throwQueryError("Falha ao carregar mensagens do lead", messagesErr)
+
   // Buscar distribuidores recomendados (Path 2)
-  const { data: recommendations } = await supabase
+  const { data: recommendations, error: recommendationsErr } = await supabase
     .from("distributor_recommendations")
     .select("*, distributors(*)")
     .eq("fb_lead_id", fbLead.id)
 
+  throwQueryError("Falha ao carregar recomendacoes do lead", recommendationsErr)
+
   // Buscar vendedor atribuido (se handoff)
   let seller = null
   if (qualifiedLead?.assignments?.[0]) {
-    const { data: agent } = await supabase
+    const { data: agent, error: agentErr } = await supabase
       .from("agents")
       .select("*")
       .eq("id", qualifiedLead.assignments[0].assignee_id)
       .single()
+    throwQueryError("Falha ao carregar vendedor do lead", agentErr)
     seller = agent
   }
 

@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { useRouter, usePathname, useSearchParams } from "next/navigation"
-import { format } from "date-fns"
+import { endOfDay, format, startOfDay, subDays } from "date-fns"
 import { ptBR } from "date-fns/locale"
 import { CalendarIcon } from "lucide-react"
 import type { DateRange } from "react-day-picker"
@@ -37,19 +37,29 @@ export function DateRangePicker({ className }: DateRangePickerProps) {
   const [open, setOpen] = useState(false)
   const [date, setDate] = useState<DateRange | undefined>(
     fromParam && toParam
-      ? { from: new Date(fromParam), to: new Date(toParam) }
+      ? {
+          from: startOfDay(new Date(fromParam)),
+          to: startOfDay(new Date(toParam)),
+        }
       : undefined
   )
 
   function navigate(from: Date, to: Date) {
     const params = new URLSearchParams(searchParams.toString())
-    params.set("from", from.toISOString())
-    params.set("to", to.toISOString())
+    params.set("from", startOfDay(from).toISOString())
+    params.set("to", endOfDay(to).toISOString())
     router.push(`${pathname}?${params.toString()}`)
   }
 
   function handleSelect(range: DateRange | undefined) {
-    setDate(range)
+    setDate(
+      range?.from
+        ? {
+            from: startOfDay(range.from),
+            to: range.to ? startOfDay(range.to) : undefined,
+          }
+        : undefined
+    )
     if (range?.from && range?.to) {
       navigate(range.from, range.to)
       setOpen(false)
@@ -57,9 +67,8 @@ export function DateRangePicker({ className }: DateRangePickerProps) {
   }
 
   function handlePreset(days: number) {
-    const to = new Date()
-    const from = new Date()
-    from.setDate(from.getDate() - days)
+    const to = startOfDay(new Date())
+    const from = startOfDay(subDays(to, days - 1))
     setDate({ from, to })
     navigate(from, to)
     setOpen(false)
