@@ -32,13 +32,13 @@ export function KPICard({
 
   return (
     <Card
-      className="relative overflow-hidden border bg-white p-6"
+      className="relative overflow-hidden border border-[#E5E7EB] bg-white p-4"
       style={{ borderLeftWidth: 4, borderLeftColor: accentColor }}
     >
       <div className="flex items-start justify-between">
         <div>
           <p className="text-sm text-[#6B7280]">{label}</p>
-          <p className="mt-1 text-3xl font-semibold tracking-tight text-[#111827]">
+          <p className="mt-1 text-[2rem] font-semibold tracking-tight text-[#111827]">
             {formatted}
           </p>
         </div>
@@ -46,7 +46,7 @@ export function KPICard({
         {delta !== null && (
           <div
             className={cn(
-              "flex items-center gap-1 rounded-md px-2 py-1 text-xs font-medium",
+              "flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-medium",
               delta > 0 && "bg-emerald-50 text-emerald-700",
               delta < 0 && "bg-red-50 text-red-700",
               delta === 0 && "bg-gray-50 text-gray-600"

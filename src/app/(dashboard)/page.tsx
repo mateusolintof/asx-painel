@@ -56,17 +56,21 @@ export default async function OverviewPage({ searchParams }: Props) {
   const KPI_COLORS = ["#B2121A", "#059669", "#2563EB", "#D97706"]
 
   return (
-    <div className="space-y-8">
-      {/* Date Range Picker */}
-      <div className="flex items-center justify-between">
-        <p className="text-sm text-[#6B7280]">
-          {hasCustomRange ? "Periodo personalizado" : "Ultimos 30 dias"}
-        </p>
+    <div className="space-y-6">
+      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+        <div>
+          <p className="text-sm text-[#6B7280]">
+            {hasCustomRange ? "Periodo personalizado" : "Ultimos 30 dias"}
+          </p>
+          <p className="mt-1 max-w-3xl text-sm text-[#94A3B8]">
+            Leitura compacta para acompanhar entrada, qualificação e avanço
+            comercial sem perder área útil do dashboard.
+          </p>
+        </div>
         <DateRangePicker />
       </div>
 
-      {/* KPI Cards */}
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {kpis.map((kpi, i) => (
           <KPICard
             key={kpi.label}
@@ -79,28 +83,43 @@ export default async function OverviewPage({ searchParams }: Props) {
         ))}
       </div>
 
-      {/* Charts Row */}
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        <Card className="col-span-1 border bg-white p-6 lg:col-span-2">
-          <h2 className="mb-4 text-base font-medium text-[#111827]">
-            Leads nos últimos {daysInRange} dias
-          </h2>
+      <div className="grid grid-cols-1 gap-4 xl:grid-cols-[minmax(0,1.8fr)_minmax(320px,0.95fr)]">
+        <Card className="col-span-1 border border-[#E5E7EB] bg-white px-4 md:px-5">
+          <div className="space-y-1">
+            <h2 className="text-base font-medium text-[#111827]">
+              Leads nos ultimos {daysInRange} dias
+            </h2>
+            <p className="text-sm text-[#6B7280]">
+              Comparacao entre volume total e qualificados Path 3 ao longo do
+              periodo.
+            </p>
+          </div>
           <TrendLine data={trend} />
         </Card>
 
-        <Card className="border bg-white p-6">
-          <h2 className="mb-4 text-base font-medium text-[#111827]">
-            Distribuição por Path
-          </h2>
+        <Card className="border border-[#E5E7EB] bg-white px-4 md:px-5">
+          <div className="space-y-1">
+            <h2 className="text-base font-medium text-[#111827]">
+              Distribuicao por Path
+            </h2>
+            <p className="text-sm text-[#6B7280]">
+              Como a entrada atual se divide entre desqualificacao, distribuicao
+              e qualificacao.
+            </p>
+          </div>
           <PathPieChart data={pathDist} />
         </Card>
       </div>
 
-      {/* Funnel */}
-      <Card className="border bg-white p-6">
-        <h2 className="mb-4 text-base font-medium text-[#111827]">
-          Funil Principal (Path 3)
-        </h2>
+      <Card className="border border-[#E5E7EB] bg-white px-4 md:px-5">
+        <div className="space-y-1">
+          <h2 className="text-base font-medium text-[#111827]">
+            Funil Principal (Path 3)
+          </h2>
+          <p className="text-sm text-[#6B7280]">
+            Queda entre etapas do pipeline que realmente avanca para handoff.
+          </p>
+        </div>
         <FunnelChart data={funnel.chart} />
       </Card>
     </div>

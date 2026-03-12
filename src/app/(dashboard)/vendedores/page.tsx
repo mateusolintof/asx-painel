@@ -1,107 +1,229 @@
-import { Card } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { getSellerPerformance } from "@/lib/queries/sellers"
-import { formatNumber, formatRelativeTime } from "@/lib/utils/format"
-import { SCORE_COLORS, SCORE_LABELS } from "@/lib/utils/constants"
 import { UserCheck } from "lucide-react"
+import { Badge } from "@/components/ui/badge"
+import { Card } from "@/components/ui/card"
+import { getSellerPerformance } from "@/lib/queries/sellers"
+import { SCORE_COLORS, SCORE_LABELS } from "@/lib/utils/constants"
+import {
+  formatNumber,
+  formatPhone,
+  formatRelativeTime,
+} from "@/lib/utils/format"
 
 export default async function VendedoresPage() {
   const sellers = await getSellerPerformance()
+  const totalAssigned = sellers.reduce((sum, seller) => sum + seller.totalLeads, 0)
+  const avgScoreBase = sellers.filter((seller) => seller.totalLeads > 0)
+  const avgScore =
+    avgScoreBase.length > 0
+      ? Math.round(
+          avgScoreBase.reduce((sum, seller) => sum + seller.avgScore, 0) /
+            avgScoreBase.length
+        )
+      : 0
+  const hottestLeads = sellers.reduce((sum, seller) => {
+    const hotClass = seller.scoreDistribution.find((item) => item.class === "quente")
+    return sum + (hotClass?.count ?? 0)
+  }, 0)
+  const topSeller = [...sellers].sort((a, b) => b.totalLeads - a.totalLeads)[0]
 
   return (
-    <div className="space-y-8">
-      {/* Seller Cards */}
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-        {sellers.map((seller) => (
-          <Card key={seller.id} className="border bg-white p-6">
-            <div className="flex items-start justify-between">
-              <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#B2121A]/10">
-                  <UserCheck className="h-5 w-5 text-[#B2121A]" />
-                </div>
-                <div>
-                  <h3 className="text-lg font-semibold text-[#111827]">{seller.name}</h3>
-                  <p className="text-sm text-[#6B7280]">{seller.phone}</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="mt-6 grid grid-cols-2 gap-4">
-              <div>
-                <p className="text-sm text-[#6B7280]">Total Leads</p>
-                <p className="mt-1 text-2xl font-semibold text-[#111827]">
-                  {formatNumber(seller.totalLeads)}
-                </p>
-              </div>
-              <div>
-                <p className="text-sm text-[#6B7280]">Score Médio</p>
-                <p className="mt-1 text-2xl font-semibold text-[#111827]">
-                  {seller.avgScore}
-                </p>
-              </div>
-            </div>
-
-            {/* Score Distribution Bar */}
-            <div className="mt-4">
-              <p className="mb-2 text-xs text-[#6B7280]">Distribuição por Score</p>
-              {seller.totalLeads > 0 ? (
-                <div className="flex h-3 overflow-hidden rounded-full">
-                  {seller.scoreDistribution.map((sd) => {
-                    const pct =
-                      seller.totalLeads > 0
-                        ? (sd.count / seller.totalLeads) * 100
-                        : 0
-                    if (pct === 0) return null
-                    const colors: Record<string, string> = {
-                      quente: "#B2121A",
-                      morno: "#D97706",
-                      frio: "#2563EB",
-                    }
-                    return (
-                      <div
-                        key={sd.class}
-                        className="transition-all"
-                        style={{
-                          width: `${pct}%`,
-                          backgroundColor: colors[sd.class] ?? "#6B7280",
-                        }}
-                      />
-                    )
-                  })}
-                </div>
-              ) : (
-                <div className="h-3 rounded-full bg-[#F3F4F6]" />
-              )}
-              <div className="mt-2 flex gap-3">
-                {seller.scoreDistribution.map((sd) => (
-                  <div key={sd.class} className="flex items-center gap-1 text-xs text-[#6B7280]">
-                    <Badge
-                      variant="outline"
-                      className={SCORE_COLORS[sd.class]}
-                    >
-                      {SCORE_LABELS[sd.class]}: {sd.count}
-                    </Badge>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {seller.latestAssignment && (
-              <p className="mt-4 text-xs text-[#9CA3AF]">
-                Último lead: {formatRelativeTime(seller.latestAssignment)}
-              </p>
-            )}
-          </Card>
-        ))}
+    <div className="space-y-6">
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <SummaryCard label="Vendedores ativos" value={formatNumber(sellers.length)} />
+        <SummaryCard
+          label="Leads distribuidos"
+          value={formatNumber(totalAssigned)}
+          accent="#D97706"
+        />
+        <SummaryCard
+          label="Leads quentes em carteira"
+          value={formatNumber(hottestLeads)}
+          accent="#059669"
+          helper={`score medio geral ${formatNumber(avgScore)}`}
+        />
+        <SummaryCard
+          label="Carteira lider"
+          value={formatNumber(topSeller?.totalLeads ?? 0)}
+          accent="#2563EB"
+          helper={
+            topSeller
+              ? `${topSeller.name} concentra a maior carteira atual`
+              : "Ainda nao existe carteira com volume relevante"
+          }
+        />
       </div>
 
-      {sellers.length === 0 && (
-        <Card className="border bg-white p-8">
+      {sellers.length === 0 ? (
+        <Card className="rounded-2xl border border-[#E5E7EB] bg-white px-5 py-8">
           <p className="text-center text-sm text-[#6B7280]">
-            Nenhum vendedor encontrado
+            Nenhum vendedor encontrado.
           </p>
         </Card>
+      ) : (
+        <div className="grid gap-4 xl:grid-cols-2">
+          {sellers.map((seller) => {
+            const topScore = [...seller.scoreDistribution].sort(
+              (a, b) => b.count - a.count
+            )[0]
+            const maxScoreCount = Math.max(
+              ...seller.scoreDistribution.map((item) => item.count),
+              0
+            )
+
+            return (
+              <Card
+                key={seller.id}
+                className="rounded-2xl border border-[#E5E7EB] bg-white px-4 py-4 md:px-5"
+              >
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div className="flex min-w-0 items-center gap-3">
+                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#B2121A]/10 text-[#B2121A]">
+                      <UserCheck className="h-5 w-5" />
+                    </div>
+                    <div className="min-w-0">
+                      <h2 className="truncate text-base font-semibold text-[#111827]">
+                        {seller.name}
+                      </h2>
+                      <p className="text-sm text-[#6B7280]">
+                        {formatPhone(seller.phone)}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="rounded-full border border-[#E5E7EB] bg-[#FCFCFB] px-3 py-1.5 text-xs font-medium text-[#6B7280]">
+                    {seller.latestAssignment
+                      ? `Ultimo lead ${formatRelativeTime(seller.latestAssignment)}`
+                      : "Sem atribuicoes recentes"}
+                  </div>
+                </div>
+
+                <div className="mt-4 grid gap-3 sm:grid-cols-3">
+                  <MetricCell
+                    label="Leads na carteira"
+                    value={formatNumber(seller.totalLeads)}
+                  />
+                  <MetricCell
+                    label="Score medio"
+                    value={formatNumber(seller.avgScore)}
+                  />
+                  <MetricCell
+                    label="Classe dominante"
+                    value={
+                      topScore && topScore.count > 0
+                        ? SCORE_LABELS[topScore.class]
+                        : "Sem score"
+                    }
+                  />
+                </div>
+
+                <div className="mt-4 rounded-2xl border border-[#E5E7EB] bg-[#FCFCFD] p-3">
+                  <div className="flex items-center justify-between gap-3">
+                    <div>
+                      <p className="text-sm font-medium text-[#111827]">
+                        Distribuicao por score
+                      </p>
+                      <p className="mt-1 text-xs text-[#6B7280]">
+                        Como a carteira atual se distribui entre quente, morno e
+                        frio.
+                      </p>
+                    </div>
+                    <div className="text-xs font-medium text-[#6B7280]">
+                      {formatNumber(seller.totalLeads)} leads
+                    </div>
+                  </div>
+
+                  <div className="mt-3 h-3 overflow-hidden rounded-full bg-[#ECEFF3]">
+                    {seller.totalLeads > 0 ? (
+                      seller.scoreDistribution.map((item) => {
+                        const width =
+                          seller.totalLeads > 0
+                            ? (item.count / seller.totalLeads) * 100
+                            : 0
+                        if (width === 0) return null
+
+                        const fillMap: Record<string, string> = {
+                          quente: "#B2121A",
+                          morno: "#D97706",
+                          frio: "#2563EB",
+                        }
+
+                        return (
+                          <div
+                            key={item.class}
+                            className="h-full"
+                            style={{
+                              width: `${width}%`,
+                              backgroundColor: fillMap[item.class] ?? "#6B7280",
+                            }}
+                          />
+                        )
+                      })
+                    ) : (
+                      <div className="h-full w-full bg-[#E5E7EB]" />
+                    )}
+                  </div>
+
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {seller.scoreDistribution.map((item) => (
+                      <Badge
+                        key={item.class}
+                        variant="outline"
+                        className={SCORE_COLORS[item.class]}
+                      >
+                        {SCORE_LABELS[item.class]}: {item.count}
+                      </Badge>
+                    ))}
+                  </div>
+
+                  {maxScoreCount === 0 ? (
+                    <p className="mt-3 text-xs text-[#8A94A6]">
+                      Ainda nao existem leads com score nessa carteira.
+                    </p>
+                  ) : null}
+                </div>
+              </Card>
+            )
+          })}
+        </div>
       )}
+    </div>
+  )
+}
+
+function SummaryCard({
+  label,
+  value,
+  helper,
+  accent = "#B2121A",
+}: {
+  label: string
+  value: string
+  helper?: string
+  accent?: string
+}) {
+  return (
+    <Card className="rounded-2xl border border-[#E5E7EB] bg-white p-4">
+      <div className="h-1.5 rounded-full" style={{ backgroundColor: accent }} />
+      <p className="mt-3 text-sm text-[#6B7280]">{label}</p>
+      <p className="mt-1 text-3xl font-semibold tracking-tight text-[#111827]">
+        {value}
+      </p>
+      <p className="mt-1 text-xs text-[#8A94A6]">
+        {helper ?? "distribuicao comercial atual"}
+      </p>
+    </Card>
+  )
+}
+
+function MetricCell({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-2xl border border-[#E5E7EB] bg-[#FCFCFB] px-3 py-3">
+      <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-[#8A94A6]">
+        {label}
+      </p>
+      <p className="mt-1 text-xl font-semibold tracking-tight text-[#111827]">
+        {value}
+      </p>
     </div>
   )
 }

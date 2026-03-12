@@ -1,167 +1,112 @@
+import type { ReactNode } from "react"
+import { AlertTriangle, Flame, UserRound } from "lucide-react"
 import { Card } from "@/components/ui/card"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
-import { Badge } from "@/components/ui/badge"
-import { ScoreBadge } from "@/components/dashboard/score-badge"
-import { StatusBadge } from "@/components/dashboard/status-badge"
+import { getLeadById } from "@/lib/queries/leads"
 import { getHotLeads } from "@/lib/queries/hot-leads"
-import { formatRelativeTime } from "@/lib/utils/format"
-import { PRIORITY_LABELS } from "@/lib/utils/constants"
-import { Flame, AlertTriangle } from "lucide-react"
-import Link from "next/link"
+import { HotLeadsTable } from "@/components/dashboard/hot-leads-table"
+import { LeadDetailSections } from "@/components/dashboard/lead-detail-sections"
+import { LeadDetailsSheet } from "@/components/dashboard/lead-details-sheet"
+import { PathBadge } from "@/components/dashboard/path-badge"
+import { StatusBadge } from "@/components/dashboard/status-badge"
 
-export default async function LeadsQuentesPage() {
+interface Props {
+  searchParams: Promise<{
+    leadId?: string
+  }>
+}
+
+export default async function LeadsQuentesPage({ searchParams }: Props) {
+  const params = await searchParams
   const hotLeads = await getHotLeads()
-
-  const urgent = hotLeads.filter((l) => l.priority === "urgent")
-  const stale = hotLeads.filter((l) => l.hours_waiting > 24)
+  const urgent = hotLeads.filter((lead) => lead.priority === "urgent")
+  const stale = hotLeads.filter((lead) => lead.hours_waiting > 24)
+  const assigned = hotLeads.filter((lead) => Boolean(lead.vendedor))
+  const selectedLead = params.leadId ? await getLeadById(params.leadId) : null
 
   return (
-    <div className="space-y-6">
-      {/* Alert banner */}
-      {stale.length > 0 && (
-        <div className="flex items-center gap-3 rounded-lg border border-red-200 bg-red-50 px-4 py-3">
-          <AlertTriangle className="h-5 w-5 text-[#B2121A]" />
-          <p className="text-sm font-medium text-[#B2121A]">
-            {stale.length} lead{stale.length > 1 ? "s" : ""} sem atividade há
-            mais de 24h
-          </p>
-        </div>
-      )}
-
-      {/* Summary */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <Card className="border-l-4 border-l-[#B2121A] bg-white p-5">
-          <p className="text-sm text-[#6B7280]">Total Pendentes</p>
-          <p className="mt-1 text-2xl font-semibold text-[#111827]">
-            {hotLeads.length}
-          </p>
-        </Card>
-        <Card className="border-l-4 border-l-[#EF4444] bg-white p-5">
-          <div className="flex items-center gap-2">
-            <Flame className="h-4 w-4 text-[#EF4444]" />
-            <p className="text-sm text-[#6B7280]">Urgentes</p>
+    <>
+      <div className="space-y-4">
+        {stale.length > 0 ? (
+          <div className="flex items-center gap-3 rounded-2xl border border-red-200 bg-red-50 px-4 py-3">
+            <AlertTriangle className="h-5 w-5 text-[#B2121A]" />
+            <div className="space-y-0.5">
+              <p className="text-sm font-medium text-[#B2121A]">
+                {stale.length} lead{stale.length === 1 ? "" : "s"} sem atividade
+                ha mais de 24h
+              </p>
+              <p className="text-xs text-[#B2121A]/80">
+                Priorize retorno rapido ou transferencia para vendedor.
+              </p>
+            </div>
           </div>
-          <p className="mt-1 text-2xl font-semibold text-[#111827]">
-            {urgent.length}
-          </p>
-        </Card>
-        <Card className="border-l-4 border-l-[#D97706] bg-white p-5">
-          <p className="text-sm text-[#6B7280]">Parados (&gt;24h)</p>
-          <p className="mt-1 text-2xl font-semibold text-[#111827]">
-            {stale.length}
-          </p>
-        </Card>
+        ) : null}
+
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+          <SummaryCard
+            title="Na fila agora"
+            value={hotLeads.length}
+            accentClass="border-l-[#B2121A]"
+          />
+          <SummaryCard
+            title="Urgentes"
+            value={urgent.length}
+            accentClass="border-l-[#EF4444]"
+            icon={<Flame className="h-4 w-4 text-[#EF4444]" />}
+          />
+          <SummaryCard
+            title="Com vendedor"
+            value={assigned.length}
+            accentClass="border-l-[#D97706]"
+            icon={<UserRound className="h-4 w-4 text-[#D97706]" />}
+          />
+        </div>
+
+        <HotLeadsTable leads={hotLeads} selectedLeadId={params.leadId} />
       </div>
 
-      {/* Table */}
-      <Card className="border bg-white p-6">
-        <div className="overflow-x-auto rounded-lg border border-[#E5E7EB]">
-          <Table>
-            <TableHeader>
-              <TableRow className="hover:bg-transparent">
-                <TableHead className="text-xs font-medium uppercase tracking-wider text-[#6B7280]">
-                  Prioridade
-                </TableHead>
-                <TableHead className="text-xs font-medium uppercase tracking-wider text-[#6B7280]">
-                  Nome
-                </TableHead>
-                <TableHead className="text-xs font-medium uppercase tracking-wider text-[#6B7280]">
-                  Empresa
-                </TableHead>
-                <TableHead className="text-xs font-medium uppercase tracking-wider text-[#6B7280]">
-                  UF
-                </TableHead>
-                <TableHead className="text-xs font-medium uppercase tracking-wider text-[#6B7280]">
-                  Score
-                </TableHead>
-                <TableHead className="text-xs font-medium uppercase tracking-wider text-[#6B7280]">
-                  Status
-                </TableHead>
-                <TableHead className="text-xs font-medium uppercase tracking-wider text-[#6B7280]">
-                  Esperando
-                </TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {hotLeads.length === 0 ? (
-                <TableRow>
-                  <TableCell
-                    colSpan={7}
-                    className="py-8 text-center text-sm text-[#6B7280]"
-                  >
-                    Nenhum lead quente pendente
-                  </TableCell>
-                </TableRow>
-              ) : (
-                hotLeads.map((lead) => {
-                  const priorityColors: Record<string, string> = {
-                    urgent: "bg-red-100 text-red-800 border-red-200",
-                    high: "bg-orange-100 text-orange-800 border-orange-200",
-                    medium: "bg-yellow-100 text-yellow-800 border-yellow-200",
-                  }
-                  return (
-                    <TableRow
-                      key={lead.fb_lead_id}
-                      className={`transition-colors hover:bg-[#FAFAFA] ${
-                        lead.hours_waiting > 24 ? "bg-red-50/50" : ""
-                      }`}
-                    >
-                      <TableCell>
-                        <Badge
-                          variant="outline"
-                          className={
-                            priorityColors[lead.priority ?? "medium"] ??
-                            priorityColors.medium
-                          }
-                        >
-                          {PRIORITY_LABELS[lead.priority ?? "medium"]}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <Link
-                          href={`/leads/${lead.fb_lead_id}`}
-                          className="text-sm font-medium text-[#111827] hover:text-[#B2121A]"
-                        >
-                          {lead.nome}
-                        </Link>
-                      </TableCell>
-                      <TableCell className="text-sm text-[#6B7280]">
-                        {lead.empresa ?? "—"}
-                      </TableCell>
-                      <TableCell className="text-sm text-[#6B7280]">
-                        {lead.estado}
-                      </TableCell>
-                      <TableCell>
-                        {lead.class ? (
-                          <ScoreBadge
-                            scoreClass={lead.class}
-                            score={lead.score ?? undefined}
-                          />
-                        ) : (
-                          <span className="text-sm text-[#9CA3AF]">—</span>
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        <StatusBadge status={lead.status} />
-                      </TableCell>
-                      <TableCell className="text-sm text-[#6B7280]">
-                        {formatRelativeTime(lead.last_activity)}
-                      </TableCell>
-                    </TableRow>
-                  )
-                })
-              )}
-            </TableBody>
-          </Table>
-        </div>
-      </Card>
-    </div>
+      {selectedLead ? (
+        <LeadDetailsSheet
+          leadId={selectedLead.fbLead.id}
+          title={selectedLead.fbLead.nome}
+          subtitle={
+            selectedLead.fbLead.nome_fantasia ??
+            selectedLead.fbLead.razao_social ??
+            "Empresa nao identificada"
+          }
+          badges={
+            <>
+              <PathBadge path={selectedLead.fbLead.path} />
+              <StatusBadge status={selectedLead.fbLead.status} />
+            </>
+          }
+        >
+          <LeadDetailSections data={selectedLead} dense />
+        </LeadDetailsSheet>
+      ) : null}
+    </>
+  )
+}
+
+function SummaryCard({
+  title,
+  value,
+  accentClass,
+  icon,
+}: {
+  title: string
+  value: number
+  accentClass: string
+  icon?: ReactNode
+}) {
+  return (
+    <Card className={`border border-[#E5E7EB] border-l-4 bg-white p-4 ${accentClass}`}>
+      <div className="flex items-center gap-2 text-sm text-[#6B7280]">
+        {icon}
+        <span>{title}</span>
+      </div>
+      <p className="mt-2 text-3xl font-semibold tracking-tight text-[#111827]">
+        {value}
+      </p>
+    </Card>
   )
 }

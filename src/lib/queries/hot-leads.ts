@@ -3,6 +3,7 @@ import { throwQueryError } from "@/lib/queries/errors"
 
 export interface HotLead {
   fb_lead_id: string
+  lead_id: string | null
   nome: string
   telefone: string
   empresa: string | null
@@ -14,6 +15,7 @@ export interface HotLead {
   class: string | null
   priority: string | null
   vendedor: string | null
+  assigned_at: string | null
   lead_created_at: string
   last_activity: string
   hours_waiting: number
@@ -66,23 +68,33 @@ export async function getHotLeads(): Promise<HotLead[]> {
 
   // 4. Batch: buscar todas as assignments por lead_id
   const leadIds = [...leadMap.values()].map((l) => l.id)
-  const assignmentMap = new Map<string, string>()
+  const assignmentMap = new Map<
+    string,
+    { assigneeId: string; assignedAt: string | null }
+  >()
 
   if (leadIds.length > 0) {
     const { data: assignments, error: assignmentsErr } = await supabase
       .from("assignments")
-      .select("lead_id, assignee_id")
+      .select("lead_id, assignee_id, assigned_at")
       .in("lead_id", leadIds)
+      .order("assigned_at", { ascending: false })
 
     throwQueryError("Falha ao carregar atribuicoes dos leads quentes", assignmentsErr)
 
     for (const a of assignments ?? []) {
-      assignmentMap.set(String(a.lead_id), String(a.assignee_id))
+      if (assignmentMap.has(String(a.lead_id))) continue
+      assignmentMap.set(String(a.lead_id), {
+        assigneeId: String(a.assignee_id),
+        assignedAt: a.assigned_at,
+      })
     }
   }
 
   // 5. Batch: buscar todos os agentes
-  const agentIds = [...new Set(assignmentMap.values())]
+  const agentIds = [
+    ...new Set([...assignmentMap.values()].map((assignment) => assignment.assigneeId)),
+  ]
   const agentMap = new Map<string, string>()
 
   if (agentIds.length > 0) {
@@ -118,8 +130,10 @@ export async function getHotLeads(): Promise<HotLead[]> {
   const results: HotLead[] = fbLeads.map((fl) => {
     const contactId = contactMap.get(fl.telefone)
     const qualifiedLead = contactId ? leadMap.get(String(contactId)) : null
-    const assigneeId = qualifiedLead ? assignmentMap.get(String(qualifiedLead.id)) : null
-    const vendedor = assigneeId ? agentMap.get(assigneeId) ?? null : null
+    const assignment = qualifiedLead
+      ? assignmentMap.get(String(qualifiedLead.id)) ?? null
+      : null
+    const vendedor = assignment ? agentMap.get(assignment.assigneeId) ?? null : null
     const lastActivity = lastMsgMap.get(fl.telefone) ?? fl.created_at
     const hoursWaiting = Math.round(
       (Date.now() - new Date(lastActivity).getTime()) / 3600000
@@ -127,6 +141,7 @@ export async function getHotLeads(): Promise<HotLead[]> {
 
     return {
       fb_lead_id: fl.id,
+      lead_id: qualifiedLead?.id ?? null,
       nome: fl.nome,
       telefone: fl.telefone,
       empresa: fl.nome_fantasia ?? fl.razao_social,
@@ -138,6 +153,7 @@ export async function getHotLeads(): Promise<HotLead[]> {
       class: qualifiedLead?.class ?? null,
       priority: qualifiedLead?.priority ?? null,
       vendedor,
+      assigned_at: assignment?.assignedAt ?? null,
       lead_created_at: fl.created_at,
       last_activity: lastActivity,
       hours_waiting: hoursWaiting,

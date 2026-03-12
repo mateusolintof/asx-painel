@@ -7,12 +7,16 @@ export interface FunnelStage {
   count: number
   percentage: number
   color: string
+  fromPreviousRate?: number
 }
 
 export interface FunnelConversion {
   label: string
   rate: number
   color: string
+  base: number
+  next: number
+  drop: number
 }
 
 export interface FunnelData {
@@ -44,26 +48,79 @@ export async function getFunnelData(period?: DateRange): Promise<FunnelData> {
   const cnpjValid = rows.filter((r) => r.cnpj_valido === true).length
   const path2 = rows.filter((r) => r.path === 2).length
   const path3 = rows.filter((r) => r.path === 3).length
-  const contacted = rows.filter((r) =>
+  const path3Rows = rows.filter((r) => r.path === 3)
+  const contacted = path3Rows.filter((r) =>
     ["contacted", "in_conversation", "handoff_done"].includes(r.status)
   ).length
-  const inConversation = rows.filter((r) =>
+  const inConversation = path3Rows.filter((r) =>
     ["in_conversation", "handoff_done"].includes(r.status)
   ).length
-  const handoff = rows.filter((r) => r.status === "handoff_done").length
+  const handoff = path3Rows.filter((r) => r.status === "handoff_done").length
 
   const pct = (v: number) => Math.round((v / total) * 100 * 10) / 10
   const rate = (next: number, base: number) =>
     base > 0 ? Math.round((next / base) * 100 * 10) / 10 : 0
 
+  const COLORS = {
+    form: "#B2121A",
+    valid: "#D97706",
+    path2: "#D97706",
+    path3: "#059669",
+    contacted: "#2563EB",
+    conversation: "#4F46E5",
+    handoff: "#B2121A",
+  } as const
+
   const summary: FunnelStage[] = [
-    { stage: "Formulários", count: total, percentage: 100, color: "#6366f1" },
-    { stage: "CNPJ Válido", count: cnpjValid, percentage: pct(cnpjValid), color: "#8b5cf6" },
-    { stage: "Distribuidor (P2)", count: path2, percentage: pct(path2), color: "#f59e0b" },
-    { stage: "Qualificado (P3)", count: path3, percentage: pct(path3), color: "#10b981" },
-    { stage: "Contatado", count: contacted, percentage: pct(contacted), color: "#3b82f6" },
-    { stage: "Em Conversa", count: inConversation, percentage: pct(inConversation), color: "#6366f1" },
-    { stage: "Handoff", count: handoff, percentage: pct(handoff), color: "#059669" },
+    {
+      stage: "Formulários",
+      count: total,
+      percentage: 100,
+      color: COLORS.form,
+      fromPreviousRate: 100,
+    },
+    {
+      stage: "CNPJ Válido",
+      count: cnpjValid,
+      percentage: pct(cnpjValid),
+      color: COLORS.valid,
+      fromPreviousRate: rate(cnpjValid, total),
+    },
+    {
+      stage: "Distribuidor (P2)",
+      count: path2,
+      percentage: pct(path2),
+      color: COLORS.path2,
+      fromPreviousRate: rate(path2, cnpjValid),
+    },
+    {
+      stage: "Qualificado (P3)",
+      count: path3,
+      percentage: pct(path3),
+      color: COLORS.path3,
+      fromPreviousRate: rate(path3, cnpjValid),
+    },
+    {
+      stage: "Contatado",
+      count: contacted,
+      percentage: pct(contacted),
+      color: COLORS.contacted,
+      fromPreviousRate: rate(contacted, path3),
+    },
+    {
+      stage: "Em Conversa",
+      count: inConversation,
+      percentage: pct(inConversation),
+      color: COLORS.conversation,
+      fromPreviousRate: rate(inConversation, contacted),
+    },
+    {
+      stage: "Handoff",
+      count: handoff,
+      percentage: pct(handoff),
+      color: COLORS.handoff,
+      fromPreviousRate: rate(handoff, inConversation),
+    },
   ]
 
   const chart: FunnelStage[] = [
@@ -76,11 +133,46 @@ export async function getFunnelData(period?: DateRange): Promise<FunnelData> {
   ]
 
   const conversions: FunnelConversion[] = [
-    { label: "Formulários → CNPJ Válido", rate: rate(cnpjValid, total), color: "#8b5cf6" },
-    { label: "CNPJ Válido → Qualificado (P3)", rate: rate(path3, cnpjValid), color: "#10b981" },
-    { label: "Qualificado (P3) → Contatado", rate: rate(contacted, path3), color: "#3b82f6" },
-    { label: "Contatado → Em Conversa", rate: rate(inConversation, contacted), color: "#6366f1" },
-    { label: "Em Conversa → Handoff", rate: rate(handoff, inConversation), color: "#059669" },
+    {
+      label: "Formulários → CNPJ Válido",
+      rate: rate(cnpjValid, total),
+      color: COLORS.valid,
+      base: total,
+      next: cnpjValid,
+      drop: total - cnpjValid,
+    },
+    {
+      label: "CNPJ Válido → Qualificado (P3)",
+      rate: rate(path3, cnpjValid),
+      color: COLORS.path3,
+      base: cnpjValid,
+      next: path3,
+      drop: cnpjValid - path3,
+    },
+    {
+      label: "Qualificado (P3) → Contatado",
+      rate: rate(contacted, path3),
+      color: COLORS.contacted,
+      base: path3,
+      next: contacted,
+      drop: path3 - contacted,
+    },
+    {
+      label: "Contatado → Em Conversa",
+      rate: rate(inConversation, contacted),
+      color: COLORS.conversation,
+      base: contacted,
+      next: inConversation,
+      drop: contacted - inConversation,
+    },
+    {
+      label: "Em Conversa → Handoff",
+      rate: rate(handoff, inConversation),
+      color: COLORS.handoff,
+      base: inConversation,
+      next: handoff,
+      drop: inConversation - handoff,
+    },
   ]
 
   return { summary, chart, conversions }

@@ -1,6 +1,6 @@
 "use client"
 
-import { useRouter, usePathname } from "next/navigation"
+import { usePathname, useRouter, useSearchParams } from "next/navigation"
 
 interface StateFilterProps {
   currentState?: string
@@ -8,19 +8,27 @@ interface StateFilterProps {
 }
 
 export function StateFilter({ currentState, states }: StateFilterProps) {
-  const router = useRouter()
   const pathname = usePathname()
+  const router = useRouter()
+  const searchParams = useSearchParams()
 
   return (
     <select
       name="estado"
       defaultValue={currentState ?? ""}
-      className="rounded-md border border-[#E5E7EB] bg-white px-3 py-2 text-sm text-[#111827]"
+      className="h-10 rounded-xl border border-[#E5E7EB] bg-[#FCFCFB] px-3 text-sm text-[#111827]"
       onChange={(e) => {
-        const url = e.target.value
-          ? `${pathname}?estado=${e.target.value}`
-          : pathname
-        router.push(url)
+        const params = new URLSearchParams(searchParams.toString())
+        if (e.target.value) {
+          params.set("estado", e.target.value)
+        } else {
+          params.delete("estado")
+        }
+
+        const query = params.toString()
+        router.replace(query ? `${pathname}?${query}` : pathname, {
+          scroll: false,
+        })
       }}
     >
       <option value="">Todos os Estados</option>

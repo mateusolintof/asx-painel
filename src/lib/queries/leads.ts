@@ -1,5 +1,12 @@
 import { createClient } from "@/lib/supabase/server"
-import type { FbLead, LeadFilters } from "@/lib/types/database"
+import type {
+  Agent,
+  Assignment,
+  FbLead,
+  IaMessage,
+  Lead,
+  LeadFilters,
+} from "@/lib/types/database"
 import { throwQueryError } from "@/lib/queries/errors"
 
 const PAGE_SIZE = 20
@@ -58,14 +65,31 @@ export async function getLeads(filters: LeadFilters = {}) {
   }
 }
 
-export async function getLeadById(id: string) {
+export interface LeadRecommendation {
+  distributors?: {
+    razao_social?: string | null
+    cidade?: string | null
+    estado_uf?: string | null
+  } | null
+}
+
+export interface LeadDetailData {
+  fbLead: FbLead
+  qualifiedLead: Lead | null
+  assignment: Assignment | null
+  messages: IaMessage[]
+  recommendations: LeadRecommendation[]
+  seller: Agent | null
+}
+
+export async function getLeadById(id: string): Promise<LeadDetailData | null> {
   const supabase = await createClient()
 
   const { data: fbLead, error: fbErr } = await supabase
     .from("fb_leads")
     .select("*")
     .eq("id", id)
-    .single()
+    .maybeSingle()
 
   throwQueryError("Falha ao carregar lead", fbErr)
   if (fbErr || !fbLead) return null
@@ -80,15 +104,29 @@ export async function getLeadById(id: string) {
   throwQueryError("Falha ao carregar contato do lead", contactErr)
 
   // Buscar lead qualificado (se existir contato)
-  let qualifiedLead = null
+  let qualifiedLead: Lead | null = null
+  let assignment: Assignment | null = null
   if (contact?.id) {
     const { data, error } = await supabase
       .from("leads")
-      .select("*, assignments(*)")
+      .select("*")
       .eq("contact_id", contact.id)
       .maybeSingle()
     throwQueryError("Falha ao carregar qualificacao do lead", error)
-    qualifiedLead = data
+    qualifiedLead = (data as Lead | null) ?? null
+  }
+
+  if (qualifiedLead?.id) {
+    const { data, error } = await supabase
+      .from("assignments")
+      .select("*")
+      .eq("lead_id", qualifiedLead.id)
+      .order("assigned_at", { ascending: false })
+      .limit(1)
+      .maybeSingle()
+
+    throwQueryError("Falha ao carregar atribuicao do lead", error)
+    assignment = (data as Assignment | null) ?? null
   }
 
   // Buscar mensagens
@@ -109,22 +147,23 @@ export async function getLeadById(id: string) {
   throwQueryError("Falha ao carregar recomendacoes do lead", recommendationsErr)
 
   // Buscar vendedor atribuido (se handoff)
-  let seller = null
-  if (qualifiedLead?.assignments?.[0]) {
+  let seller: Agent | null = null
+  if (assignment?.assignee_id) {
     const { data: agent, error: agentErr } = await supabase
       .from("agents")
       .select("*")
-      .eq("id", qualifiedLead.assignments[0].assignee_id)
+      .eq("id", assignment.assignee_id)
       .single()
     throwQueryError("Falha ao carregar vendedor do lead", agentErr)
-    seller = agent
+    seller = (agent as Agent | null) ?? null
   }
 
   return {
-    fbLead,
+    fbLead: fbLead as FbLead,
     qualifiedLead,
-    messages: messages ?? [],
-    recommendations: recommendations ?? [],
+    assignment,
+    messages: (messages ?? []) as IaMessage[],
+    recommendations: (recommendations ?? []) as LeadRecommendation[],
     seller,
   }
 }
