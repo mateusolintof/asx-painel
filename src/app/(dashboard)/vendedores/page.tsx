@@ -39,7 +39,7 @@ export default async function VendedoresPage() {
           label="Leads quentes em carteira"
           value={formatNumber(hottestLeads)}
           accent="#059669"
-          helper={`score medio geral ${formatNumber(avgScore)}`}
+          helper={`pontuacao media geral ${formatNumber(avgScore)}`}
         />
         <SummaryCard
           label="Carteira lider"
@@ -103,7 +103,7 @@ export default async function VendedoresPage() {
                     value={formatNumber(seller.totalLeads)}
                   />
                   <MetricCell
-                    label="Score medio"
+                    label="Pontuacao media"
                     value={formatNumber(seller.avgScore)}
                   />
                   <MetricCell
@@ -111,7 +111,7 @@ export default async function VendedoresPage() {
                     value={
                       topScore && topScore.count > 0
                         ? SCORE_LABELS[topScore.class]
-                        : "Sem score"
+                        : "Sem classificacao"
                     }
                   />
                 </div>
@@ -120,7 +120,7 @@ export default async function VendedoresPage() {
                   <div className="flex items-center justify-between gap-3">
                     <div>
                       <p className="text-sm font-medium text-[#111827]">
-                        Distribuicao por score
+                        Distribuicao por temperatura
                       </p>
                       <p className="mt-1 text-xs text-[#6B7280]">
                         Como a carteira atual se distribui entre quente, morno e
@@ -177,7 +177,7 @@ export default async function VendedoresPage() {
 
                   {maxScoreCount === 0 ? (
                     <p className="mt-3 text-xs text-[#8A94A6]">
-                      Ainda nao existem leads com score nessa carteira.
+                      Ainda nao existem leads classificados nessa carteira.
                     </p>
                   ) : null}
                 </div>
@@ -209,7 +209,7 @@ function SummaryCard({
         {value}
       </p>
       <p className="mt-1 text-xs text-[#8A94A6]">
-        {helper ?? "distribuicao comercial atual"}
+        {helper ?? "leitura atual da carteira"}
       </p>
     </Card>
   )

@@ -1,7 +1,7 @@
 export const PATH_LABELS: Record<number, string> = {
-  1: "Desqualificado",
-  2: "Distribuidor",
-  3: "Qualificado",
+  1: "Fora do perfil",
+  2: "Encaminhado a parceiro",
+  3: "Atendimento interno",
 }
 
 export const PATH_COLORS: Record<number, string> = {

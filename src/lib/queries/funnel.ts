@@ -73,7 +73,7 @@ export async function getFunnelData(period?: DateRange): Promise<FunnelData> {
 
   const summary: FunnelStage[] = [
     {
-      stage: "Formulários",
+      stage: "Entradas",
       count: total,
       percentage: 100,
       color: COLORS.form,
@@ -87,21 +87,21 @@ export async function getFunnelData(period?: DateRange): Promise<FunnelData> {
       fromPreviousRate: rate(cnpjValid, total),
     },
     {
-      stage: "Distribuidor (P2)",
+      stage: "Encaminhado a parceiro",
       count: path2,
       percentage: pct(path2),
       color: COLORS.path2,
       fromPreviousRate: rate(path2, cnpjValid),
     },
     {
-      stage: "Qualificado (P3)",
+      stage: "Atendimento interno",
       count: path3,
       percentage: pct(path3),
       color: COLORS.path3,
       fromPreviousRate: rate(path3, cnpjValid),
     },
     {
-      stage: "Contatado",
+      stage: "Primeiro contato",
       count: contacted,
       percentage: pct(contacted),
       color: COLORS.contacted,
@@ -115,7 +115,7 @@ export async function getFunnelData(period?: DateRange): Promise<FunnelData> {
       fromPreviousRate: rate(inConversation, contacted),
     },
     {
-      stage: "Handoff",
+      stage: "Transferido ao vendedor",
       count: handoff,
       percentage: pct(handoff),
       color: COLORS.handoff,
@@ -134,7 +134,7 @@ export async function getFunnelData(period?: DateRange): Promise<FunnelData> {
 
   const conversions: FunnelConversion[] = [
     {
-      label: "Formulários → CNPJ Válido",
+      label: "Entradas -> CNPJ valido",
       rate: rate(cnpjValid, total),
       color: COLORS.valid,
       base: total,
@@ -142,7 +142,7 @@ export async function getFunnelData(period?: DateRange): Promise<FunnelData> {
       drop: total - cnpjValid,
     },
     {
-      label: "CNPJ Válido → Qualificado (P3)",
+      label: "CNPJ valido -> Atendimento interno",
       rate: rate(path3, cnpjValid),
       color: COLORS.path3,
       base: cnpjValid,
@@ -150,7 +150,7 @@ export async function getFunnelData(period?: DateRange): Promise<FunnelData> {
       drop: cnpjValid - path3,
     },
     {
-      label: "Qualificado (P3) → Contatado",
+      label: "Atendimento interno -> Primeiro contato",
       rate: rate(contacted, path3),
       color: COLORS.contacted,
       base: path3,
@@ -158,7 +158,7 @@ export async function getFunnelData(period?: DateRange): Promise<FunnelData> {
       drop: path3 - contacted,
     },
     {
-      label: "Contatado → Em Conversa",
+      label: "Primeiro contato -> Em conversa",
       rate: rate(inConversation, contacted),
       color: COLORS.conversation,
       base: contacted,
@@ -166,7 +166,7 @@ export async function getFunnelData(period?: DateRange): Promise<FunnelData> {
       drop: contacted - inConversation,
     },
     {
-      label: "Em Conversa → Handoff",
+      label: "Em conversa -> Transferido ao vendedor",
       rate: rate(handoff, inConversation),
       color: COLORS.handoff,
       base: inConversation,

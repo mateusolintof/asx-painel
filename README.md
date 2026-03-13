@@ -18,12 +18,12 @@ Painel de gestao para a equipe da **ASX Iluminacao Automotiva** acompanhar leads
 
 | Rota | Pagina | O que mostra |
 |------|--------|-------------|
-| `/` | Overview | KPIs, trend line, distribuicao por path, funil resumido |
-| `/leads` | Leads | Tabela paginada com filtros (path, status, busca) |
+| `/` | Overview | KPIs, evolucao das entradas, destino dos leads e funil resumido |
+| `/leads` | Leads | Tabela paginada com filtros de destino, status e busca |
 | `/leads/:id` | Detalhe | Dados do lead + historico de conversa com o agente |
 | `/funil` | Funil | 7 estagios do funil com taxas de conversao |
 | `/vendedores` | Vendedores | Performance de cada vendedor (leads, scores) |
-| `/distribuidores` | Distribuidores | Recomendacoes feitas para leads Path 2 |
+| `/distribuidores` | Distribuidores | Recomendacoes feitas para leads enviados a distribuidores |
 | `/comparativos` | Comparativos | Semana/Mes atual vs anterior |
 | `/leads-quentes` | Leads Quentes | Leads classificados como quentes em acompanhamento prioritario |
 

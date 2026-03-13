@@ -40,7 +40,7 @@ function getPresetPeriods(preset: string) {
       labelA: "Este mes",
       labelB: "Mes passado",
       description:
-        "Recorte mais amplo para medir consistencia do funil, handoff e qualidade media.",
+        "Recorte mais amplo para medir consistencia do funil, transferencias e qualidade media.",
     }
   }
 

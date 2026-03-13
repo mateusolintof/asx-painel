@@ -59,7 +59,7 @@ export function FunnelChart({ data }: FunnelChartProps) {
               </div>
             ) : null}
 
-            <div className="grid gap-3 rounded-2xl border border-[#E5E7EB] bg-white/70 p-3 md:grid-cols-[148px_minmax(0,1fr)_132px] md:items-center">
+            <div className="grid gap-3 rounded-2xl border border-[#E5E7EB] bg-white/70 p-3 md:grid-cols-[196px_minmax(0,1fr)_132px] md:items-center">
               <div className="space-y-1">
                 <p className="text-sm font-medium text-[#111827]">{stage.stage}</p>
                 <p className="text-xs text-[#6B7280]">

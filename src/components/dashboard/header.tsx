@@ -22,11 +22,11 @@ const PAGE_META: Record<string, { title: string; hint: string }> = {
   },
   "/vendedores": {
     title: "Vendedores",
-    hint: "Distribuição comercial e desempenho",
+    hint: "Carteira, distribuicao e desempenho",
   },
   "/distribuidores": {
     title: "Distribuidores",
-    hint: "Rede recomendada por região",
+    hint: "Rede parceira por regiao",
   },
   "/comparativos": {
     title: "Comparativos",
@@ -34,7 +34,7 @@ const PAGE_META: Record<string, { title: string; hint: string }> = {
   },
   "/leads-quentes": {
     title: "Leads Quentes",
-    hint: "Monitoramento prioritario apos handoff",
+    hint: "Monitoramento prioritario apos a transferencia",
   },
 }
 
@@ -73,7 +73,7 @@ export function Header() {
         </Button>
         <div className="min-w-0">
           <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">
-            Cockpit comercial
+            Painel comercial
           </p>
           <h1 className="truncate text-lg font-semibold text-foreground md:text-xl">
             {pageMeta.title}

@@ -48,8 +48,7 @@ export function LeadDetailSections({
                 Dados do lead
               </h3>
               <p className="text-xs text-[#6B7280]">
-                Campos persistidos pelo pipeline comercial e validados para
-                consulta operacional.
+                Informacoes principais consolidadas para consulta da equipe.
               </p>
             </div>
             <div className="flex flex-wrap gap-2">
@@ -79,9 +78,8 @@ export function LeadDetailSections({
           </div>
 
           <div className="mt-4 rounded-xl border border-dashed border-[#E5E7EB] bg-[#F7F7F6] px-3 py-2.5 text-xs text-[#6B7280]">
-            Respostas extras do formulario do Facebook so aparecem aqui se
-            estiverem persistidas na base. Hoje o painel exibe os campos
-            operacionais disponiveis no pipeline.
+            O painel mostra aqui os dados que ja estao aproveitados pela
+            operacao no atendimento do lead.
           </div>
 
           {fbLead.cnpj_valido ? (
@@ -115,10 +113,10 @@ export function LeadDetailSections({
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div className="space-y-1">
                 <h3 className="text-sm font-semibold text-[#111827]">
-                  Qualificacao e handoff
+                  Analise e transferencia
                 </h3>
                 <p className="text-xs text-[#6B7280]">
-                  Tudo o que o time precisa para decidir a proxima acao.
+                  Resumo do que o time precisa para decidir a proxima acao.
                 </p>
               </div>
               <div className="flex flex-wrap gap-2">
@@ -163,7 +161,7 @@ export function LeadDetailSections({
               />
               <Detail
                 label="Vendedor"
-                value={seller?.name ?? "Ainda nao transferido"}
+                value={seller?.name ?? "Sem vendedor definido"}
               />
               <Detail
                 label="Transferido em"
@@ -177,11 +175,11 @@ export function LeadDetailSections({
           <Card className={cn("rounded-2xl border border-[#E5E7EB] bg-white", cardPadding)}>
             <div className="space-y-1">
               <h3 className="text-sm font-semibold text-[#111827]">
-                Distribuidores recomendados
+                Parceiros recomendados
               </h3>
               <p className="text-xs text-[#6B7280]">
-                Indicacoes acionadas para leads desviados ao fluxo de
-                distribuidores.
+                Parceiros sugeridos quando o lead seguiu para atendimento
+                externo.
               </p>
             </div>
 
@@ -193,7 +191,7 @@ export function LeadDetailSections({
                 >
                   <div className="min-w-0 space-y-1">
                     <p className="truncate text-sm font-medium text-[#111827]">
-                      {recommendation.distributors?.razao_social ?? "Distribuidor"}
+                      {recommendation.distributors?.razao_social ?? "Parceiro"}
                     </p>
                     <p className="truncate text-xs text-[#6B7280]">
                       {recommendation.distributors?.cidade ?? "Cidade"} /{" "}
@@ -217,7 +215,7 @@ export function LeadDetailSections({
           </h3>
           <p className="text-xs text-[#6B7280]">
             {messages.length} {messages.length === 1 ? "mensagem" : "mensagens"} no
-            historico visivel.
+            historico carregado.
           </p>
         </div>
 

@@ -10,19 +10,19 @@ export async function getKPIs(current: DateRange, previous: DateRange): Promise<
 
   return [
     {
-      label: "Total Leads",
+      label: "Entradas",
       value: currentData.total,
       previousValue: previousData.total,
       format: "number",
     },
     {
-      label: "Qualificados (P3)",
+      label: "Atendimento interno",
       value: currentData.qualified,
       previousValue: previousData.qualified,
       format: "number",
     },
     {
-      label: "Taxa de Handoff",
+      label: "Taxa de transferencia",
       value: currentData.total > 0
         ? (currentData.handoff / currentData.total) * 100
         : 0,
@@ -32,7 +32,7 @@ export async function getKPIs(current: DateRange, previous: DateRange): Promise<
       format: "percent",
     },
     {
-      label: "Score Médio",
+      label: "Pontuacao media",
       value: currentData.avgScore,
       previousValue: previousData.avgScore,
       format: "number",
@@ -75,25 +75,49 @@ async function getPeriodStats(period: DateRange) {
 export async function getTrendData(period?: DateRange) {
   const supabase = await createClient()
 
+  const fromDay = period
+    ? period.from.split("T")[0]
+    : (() => {
+        const from = new Date()
+        from.setDate(from.getDate() - 30)
+        return from.toISOString().split("T")[0]
+      })()
+
+  const toDay = period
+    ? period.to.split("T")[0]
+    : new Date().toISOString().split("T")[0]
+
   let query = supabase
     .from("v_funnel_summary")
     .select("*")
     .order("day", { ascending: true })
 
-  if (period) {
-    query = query
-      .gte("day", period.from.split("T")[0])
-      .lte("day", period.to.split("T")[0])
-  } else {
-    const from = new Date()
-    from.setDate(from.getDate() - 30)
-    query = query.gte("day", from.toISOString().split("T")[0])
-  }
+  query = query.gte("day", fromDay).lte("day", toDay)
 
   const { data, error } = await query
 
   throwQueryError("Falha ao carregar tendencia do funil", error)
-  return data ?? []
+  const rows = data ?? []
+  const rowsByDay = new Map(rows.map((row) => [row.day, row]))
+
+  return buildDayRange(fromDay, toDay).map((day) => {
+    const existing = rowsByDay.get(day)
+    if (existing) return existing
+
+    return {
+      day,
+      total_leads: 0,
+      path1_disqualified: 0,
+      path2_distributor: 0,
+      path3_qualified: 0,
+      contacted: 0,
+      in_conversation: 0,
+      handoff_done: 0,
+      disqualified_cnpj: 0,
+      disqualified_policy: 0,
+      send_failed: 0,
+    }
+  })
 }
 
 export async function getPathDistribution(period?: DateRange) {
@@ -109,12 +133,25 @@ export async function getPathDistribution(period?: DateRange) {
 
   const { data, error } = await query
 
-  throwQueryError("Falha ao carregar distribuicao por path", error)
+  throwQueryError("Falha ao carregar destinos dos leads", error)
 
   const rows = data ?? []
   return [
-    { name: "Desqualificado", value: rows.filter((r) => r.path === 1).length, fill: "#ef4444" },
-    { name: "Distribuidor", value: rows.filter((r) => r.path === 2).length, fill: "#f59e0b" },
-    { name: "Qualificado", value: rows.filter((r) => r.path === 3).length, fill: "#10b981" },
+    { name: "Fora do perfil", value: rows.filter((r) => r.path === 1).length, fill: "#ef4444" },
+    { name: "Encaminhado a parceiro", value: rows.filter((r) => r.path === 2).length, fill: "#f59e0b" },
+    { name: "Atendimento interno", value: rows.filter((r) => r.path === 3).length, fill: "#10b981" },
   ]
+}
+
+function buildDayRange(fromDay: string, toDay: string) {
+  const days: string[] = []
+  const current = new Date(`${fromDay}T00:00:00Z`)
+  const end = new Date(`${toDay}T00:00:00Z`)
+
+  while (current <= end) {
+    days.push(current.toISOString().split("T")[0])
+    current.setUTCDate(current.getUTCDate() + 1)
+  }
+
+  return days
 }

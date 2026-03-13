@@ -19,16 +19,16 @@ export default async function FunilPage({ searchParams }: Props) {
   const stageMap = new Map(funnel.summary.map((stage) => [stage.stage, stage]))
 
   const entryStages = [
-    stageMap.get("Formulários"),
+    stageMap.get("Entradas"),
     stageMap.get("CNPJ Válido"),
-    stageMap.get("Distribuidor (P2)"),
-    stageMap.get("Qualificado (P3)"),
+    stageMap.get("Encaminhado a parceiro"),
+    stageMap.get("Atendimento interno"),
   ].filter(Boolean) as FunnelStage[]
 
   const pipelineStages = [
-    stageMap.get("Contatado"),
+    stageMap.get("Primeiro contato"),
     stageMap.get("Em Conversa"),
-    stageMap.get("Handoff"),
+    stageMap.get("Transferido ao vendedor"),
   ].filter(Boolean) as FunnelStage[]
 
   return (
@@ -39,9 +39,8 @@ export default async function FunilPage({ searchParams }: Props) {
             {period ? "Período personalizado" : "Todos os leads"}
           </p>
           <p className="mt-1 max-w-3xl text-sm text-[#94A3B8]">
-            Entrada, validação e desvio para distribuidores aparecem separados do
-            fluxo principal de handoff. Assim as taxas do Path 3 permanecem
-            coerentes com a operação comercial real.
+            A leitura separa triagem inicial, encaminhamento a parceiros e
+            avancos do time interno sem misturar fluxos diferentes.
           </p>
         </div>
         <DateRangePicker />
@@ -54,11 +53,13 @@ export default async function FunilPage({ searchParams }: Props) {
               key={stage.stage}
               stage={stage}
               helper={
-                stage.stage === "Distribuidor (P2)"
-                  ? "desvio operacional"
-                  : stage.stage === "Qualificado (P3)"
-                    ? "segue no funil"
-                    : "etapa de entrada"
+                stage.stage === "Encaminhado a parceiro"
+                  ? "segue para parceiro"
+                  : stage.stage === "Atendimento interno"
+                    ? "segue para o time interno"
+                    : stage.stage === "CNPJ Válido"
+                      ? "documento conferido"
+                      : "base recebida"
               }
             />
           ))}
@@ -69,7 +70,7 @@ export default async function FunilPage({ searchParams }: Props) {
         <Card className="bg-white px-4 md:px-5">
           <div className="space-y-1">
             <h2 className="text-base font-medium text-[#111827]">
-              Funil Principal (Path 3)
+              Funil do atendimento interno
             </h2>
             <p className="text-sm text-[#6B7280]">
               Cada etapa mostra o volume atual, a participação no total e a taxa
@@ -84,11 +85,11 @@ export default async function FunilPage({ searchParams }: Props) {
           <Card className="bg-white px-4 md:px-5">
             <div className="space-y-1">
               <h2 className="text-base font-medium text-[#111827]">
-                Desvio Operacional
+                Encaminhados a parceiros
               </h2>
               <p className="text-sm text-[#6B7280]">
-                Leads com CNPJ válido que não entram no handoff e seguem para o
-                fluxo de distribuidores.
+                Leads com CNPJ valido que nao seguem no time interno e sao
+                enviados para parceiros regionais.
               </p>
             </div>
 
@@ -96,23 +97,23 @@ export default async function FunilPage({ searchParams }: Props) {
               <div className="flex items-center justify-between gap-3">
                 <div>
                   <p className="text-sm font-medium text-[#92400E]">
-                    Distribuidor (P2)
+                    Encaminhado a parceiro
                   </p>
                   <p className="mt-1 text-3xl font-semibold tracking-tight text-[#111827]">
-                    {formatNumber(stageMap.get("Distribuidor (P2)")?.count ?? 0)}
+                    {formatNumber(stageMap.get("Encaminhado a parceiro")?.count ?? 0)}
                   </p>
                 </div>
                 <div className="rounded-full bg-white px-3 py-1.5 text-xs font-medium text-[#92400E] ring-1 ring-inset ring-[#FCD34D]">
                   {formatPercent(
-                    stageMap.get("Distribuidor (P2)")?.fromPreviousRate ?? 0
+                    stageMap.get("Encaminhado a parceiro")?.fromPreviousRate ?? 0
                   )}{" "}
-                  dos CNPJs válidos
+                  dos CNPJs validos
                 </div>
               </div>
               <p className="mt-3 text-sm text-[#A16207]">
-                Esse volume sai do fluxo principal antes da qualificação do
-                vendedor, então deve ser lido como branch de atendimento e não
-                como queda do pipeline Path 3.
+                Esse volume sai do fluxo principal antes de chegar a um
+                vendedor, entao deve ser lido como encaminhamento alternativo e
+                nao como queda do funil.
               </p>
             </div>
           </Card>
@@ -120,10 +121,10 @@ export default async function FunilPage({ searchParams }: Props) {
           <Card className="bg-white px-4 md:px-5">
             <div className="space-y-1">
               <h2 className="text-base font-medium text-[#111827]">
-                Pipeline de Handoff
+                Etapas finais do atendimento
               </h2>
               <p className="text-sm text-[#6B7280]">
-                Leitura rápida das etapas finais do fluxo comercial.
+                Leitura rapida do avanco do time interno ate chegar ao vendedor.
               </p>
             </div>
 

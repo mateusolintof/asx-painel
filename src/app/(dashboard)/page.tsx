@@ -63,8 +63,8 @@ export default async function OverviewPage({ searchParams }: Props) {
             {hasCustomRange ? "Periodo personalizado" : "Ultimos 30 dias"}
           </p>
           <p className="mt-1 max-w-3xl text-sm text-[#94A3B8]">
-            Leitura compacta para acompanhar entrada, qualificação e avanço
-            comercial sem perder área útil do dashboard.
+            Visao rapida do volume recebido, do que avancou para o time interno
+            e da passagem para os vendedores.
           </p>
         </div>
         <DateRangePicker />
@@ -83,41 +83,40 @@ export default async function OverviewPage({ searchParams }: Props) {
         ))}
       </div>
 
-      <div className="grid grid-cols-1 gap-4 xl:grid-cols-[minmax(0,1.45fr)_minmax(400px,1fr)]">
-        <Card className="col-span-1 min-w-0 border border-[#E5E7EB] bg-white px-4 md:px-5">
-          <div className="space-y-1">
-            <h2 className="text-base font-medium text-[#111827]">
-              Leads nos ultimos {daysInRange} dias
-            </h2>
-            <p className="text-sm text-[#6B7280]">
-              Comparacao entre volume total e qualificados Path 3 ao longo do
-              periodo.
-            </p>
-          </div>
-          <TrendLine data={trend} />
-        </Card>
-
-        <Card className="min-w-0 border border-[#E5E7EB] bg-white px-4 md:px-5">
-          <div className="space-y-1">
-            <h2 className="text-base font-medium text-[#111827]">
-              Distribuicao por Path
-            </h2>
-            <p className="text-sm text-[#6B7280]">
-              Como a entrada atual se divide entre desqualificacao, distribuicao
-              e qualificacao.
-            </p>
-          </div>
-          <PathPieChart data={pathDist} />
-        </Card>
-      </div>
+      <Card className="col-span-1 min-w-0 border border-[#E5E7EB] bg-white px-4 md:px-5">
+        <div className="space-y-1">
+          <h2 className="text-base font-medium text-[#111827]">
+            Leads nos ultimos {daysInRange} dias
+          </h2>
+          <p className="text-sm text-[#6B7280]">
+            Volume recebido por dia comparado ao que permaneceu com o time
+            comercial da ASX.
+          </p>
+        </div>
+        <TrendLine data={trend} />
+      </Card>
 
       <Card className="min-w-0 border border-[#E5E7EB] bg-white px-4 md:px-5">
         <div className="space-y-1">
           <h2 className="text-base font-medium text-[#111827]">
-            Funil Principal (Path 3)
+            Destino apos a triagem
           </h2>
           <p className="text-sm text-[#6B7280]">
-            Queda entre etapas do pipeline que realmente avanca para handoff.
+            Como os contatos recebidos se dividiram entre descarte, parceiros e
+            atendimento interno.
+          </p>
+        </div>
+        <PathPieChart data={pathDist} />
+      </Card>
+
+      <Card className="min-w-0 border border-[#E5E7EB] bg-white px-4 md:px-5">
+        <div className="space-y-1">
+          <h2 className="text-base font-medium text-[#111827]">
+            Funil comercial
+          </h2>
+          <p className="text-sm text-[#6B7280]">
+            Evolucao das oportunidades que ficam no time interno ate chegarem
+            ao vendedor.
           </p>
         </div>
         <FunnelChart data={funnel.chart} />

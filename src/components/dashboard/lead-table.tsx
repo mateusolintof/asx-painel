@@ -23,7 +23,12 @@ import { Input } from "@/components/ui/input"
 import { PathBadge } from "@/components/dashboard/path-badge"
 import { StatusBadge } from "@/components/dashboard/status-badge"
 import type { FbLead } from "@/lib/types/database"
-import { formatCNPJ, formatDate, formatPhone } from "@/lib/utils/format"
+import {
+  formatCNPJ,
+  formatDate,
+  formatLeadRoutingReason,
+  formatPhone,
+} from "@/lib/utils/format"
 import { cn } from "@/lib/utils"
 
 type SortField = "created_at" | "nome" | "status" | "path" | "estado_envio"
@@ -224,9 +229,9 @@ export function LeadTable({
     },
     {
       accessorKey: "path",
-      size: 108,
-      minSize: 96,
-      header: "Path",
+      size: 176,
+      minSize: 156,
+      header: "Destino",
       cell: ({ row }) => <PathBadge path={row.original.path} />,
     },
     {
@@ -247,7 +252,7 @@ export function LeadTable({
             {formatDate(row.original.created_at)}
           </p>
           <p className="text-xs text-[#6B7280]">
-            {row.original.path_reason ?? "Sem observacao"}
+            {formatLeadRoutingReason(row.original.path_reason)}
           </p>
         </div>
       ),
@@ -302,10 +307,10 @@ export function LeadTable({
             value={currentPath}
             onChange={(event) => updateParams({ path: event.target.value }, true)}
           >
-            <option value="">Todos os Paths</option>
-            <option value="1">Path 1 - Desqualificado</option>
-            <option value="2">Path 2 - Distribuidor</option>
-            <option value="3">Path 3 - Qualificado</option>
+            <option value="">Todos os destinos</option>
+            <option value="1">Fora do perfil</option>
+            <option value="2">Encaminhado a parceiro</option>
+            <option value="3">Atendimento interno</option>
           </select>
 
           <select

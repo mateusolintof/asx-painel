@@ -73,3 +73,31 @@ export function calcDelta(current: number, previous: number): number {
   if (previous === 0) return current > 0 ? 100 : 0
   return ((current - previous) / previous) * 100
 }
+
+export function formatLeadRoutingReason(reason: string | null): string {
+  if (!reason) return "Sem observacao"
+
+  const normalized = reason.toLowerCase()
+
+  if (normalized.includes("qualificado")) {
+    return "Seguiu para atendimento interno"
+  }
+
+  if (
+    normalized.includes("distribuidor") ||
+    normalized.includes("volume <") ||
+    normalized.includes("volume abaixo")
+  ) {
+    return "Encaminhado a parceiro regional"
+  }
+
+  if (normalized.includes("cnpj")) {
+    return "Fora do perfil por CNPJ"
+  }
+
+  if (normalized.includes("politica")) {
+    return "Fora do perfil por politica interna"
+  }
+
+  return reason
+}

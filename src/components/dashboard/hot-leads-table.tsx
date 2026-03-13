@@ -154,7 +154,7 @@ export function HotLeadsTable({
       accessorKey: "score",
       size: 110,
       minSize: 96,
-      header: "Score",
+      header: "Temperatura",
       cell: ({ row }) =>
         row.original.class ? (
           <ScoreBadge
@@ -162,7 +162,7 @@ export function HotLeadsTable({
             score={row.original.score ?? undefined}
           />
         ) : (
-          <span className="text-sm text-[#9CA3AF]">Nao calculado</span>
+          <span className="text-sm text-[#9CA3AF]">Sem classificacao</span>
         ),
     },
     {
@@ -192,11 +192,11 @@ export function HotLeadsTable({
             <span className="rounded-full bg-[#F3F4F6] p-1.5 text-[#6B7280]">
               <UserRound className="h-3.5 w-3.5" />
             </span>
-            {row.original.vendedor ?? "Sem transferencia"}
+            {row.original.vendedor ?? "Sem vendedor"}
           </div>
           <p className="text-xs text-[#6B7280]">
             {row.original.assigned_at
-              ? `Atribuido em ${formatDateTime(row.original.assigned_at)}`
+              ? `Recebido em ${formatDateTime(row.original.assigned_at)}`
               : "Nenhum vendedor vinculado ainda"}
           </p>
         </div>

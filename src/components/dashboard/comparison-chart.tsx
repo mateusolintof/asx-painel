@@ -67,7 +67,7 @@ export function ComparisonChart({
           <YAxis
             type="category"
             dataKey="name"
-            width={164}
+            width={196}
             tick={{ fontSize: 12, fill: "#475569" }}
             axisLine={false}
             tickLine={false}

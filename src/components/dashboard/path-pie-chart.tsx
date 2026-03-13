@@ -1,10 +1,20 @@
 "use client"
 
-import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip } from "recharts"
+import {
+  BadgeAlert,
+  Building2,
+  BriefcaseBusiness,
+} from "lucide-react"
 import { formatNumber, formatPercent } from "@/lib/utils/format"
 
 interface PathPieChartProps {
   data: { name: string; value: number; fill: string }[]
+}
+
+const DESTINATION_HELPERS: Record<string, string> = {
+  "Fora do perfil": "contatos descartados antes do atendimento",
+  "Encaminhado a parceiro": "seguiram para parceiros regionais",
+  "Atendimento interno": "seguiram para o time comercial da ASX",
 }
 
 export function PathPieChart({ data }: PathPieChartProps) {
@@ -19,75 +29,101 @@ export function PathPieChart({ data }: PathPieChartProps) {
   }
 
   return (
-    <div className="grid gap-4 2xl:grid-cols-[220px_minmax(0,1fr)] 2xl:items-center">
-      <div className="relative mx-auto h-[220px] w-full min-w-0 max-w-[220px]">
-        <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={220}>
-          <PieChart>
-            <Pie
-              data={data}
-              dataKey="value"
-              innerRadius={62}
-              outerRadius={90}
-              paddingAngle={3}
-              stroke="#FFFFFF"
-              strokeWidth={4}
-            >
-              {data.map((entry) => (
-                <Cell key={entry.name} fill={entry.fill} />
-              ))}
-            </Pie>
-            <Tooltip
-              formatter={(value, name) => [
-                `${formatNumber(Number(value))} leads`,
-                String(name),
-              ]}
-              contentStyle={{
-                borderRadius: 16,
-                border: "1px solid #E5E7EB",
-                boxShadow: "0 10px 30px rgba(15,23,42,0.08)",
-                fontSize: 13,
-              }}
-            />
-          </PieChart>
-        </ResponsiveContainer>
-
-        <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-          <div className="rounded-full bg-white/96 px-4 py-2 text-center ring-1 ring-inset ring-[#E5E7EB]">
-            <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-[#94A3B8]">
-              Total
+    <div className="space-y-4">
+      <div className="rounded-2xl border border-[#E5E7EB] bg-[#FCFCFB] p-4">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+          <div className="space-y-1">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#8A94A6]">
+              Resumo do periodo
             </p>
-            <p className="mt-0.5 text-2xl font-semibold tracking-tight text-[#111827]">
+            <p className="text-3xl font-semibold tracking-tight text-[#111827]">
               {formatNumber(total)}
             </p>
+            <p className="max-w-xl text-sm text-[#6B7280]">
+              leads distribuidos entre descarte, parceiros e time comercial
+              interno.
+            </p>
           </div>
+
+          <div className="grid gap-2 sm:grid-cols-3">
+            {data.map((item) => {
+              const share = total > 0 ? (item.value / total) * 100 : 0
+
+              return (
+                <div
+                  key={item.name}
+                  className="rounded-xl border border-[#E5E7EB] bg-white px-3 py-2.5"
+                >
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#8A94A6]">
+                    {item.name}
+                  </p>
+                  <div className="mt-1 flex items-end justify-between gap-3">
+                    <p className="text-2xl font-semibold tracking-tight text-[#111827]">
+                      {formatNumber(item.value)}
+                    </p>
+                    <p className="text-xs font-medium text-[#6B7280]">
+                      {formatPercent(share)}
+                    </p>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+
+        <div className="mt-4 flex h-3 overflow-hidden rounded-full bg-[#E8ECF2]">
+          {data.map((item) => {
+            const share = total > 0 ? (item.value / total) * 100 : 0
+
+            if (share === 0) return null
+
+            return (
+              <div
+                key={item.name}
+                className="h-full"
+                style={{
+                  width: `${share}%`,
+                  backgroundColor: item.fill,
+                }}
+              />
+            )
+          })}
         </div>
       </div>
 
-      <div className="space-y-3">
+      <div className="grid gap-3 xl:grid-cols-3">
         {data.map((item) => {
           const share = total > 0 ? (item.value / total) * 100 : 0
+          const Icon = getDestinationIcon(item.name)
 
           return (
             <div
               key={item.name}
-              className="rounded-2xl border border-[#E5E7EB] bg-white/70 p-3"
+              className="rounded-2xl border border-[#E5E7EB] bg-white p-4"
             >
-              <div className="flex min-w-0 items-center justify-between gap-3">
-                <div className="flex min-w-0 items-center gap-2">
-                  <span
-                    className="h-2.5 w-2.5 rounded-full"
-                    style={{ backgroundColor: item.fill }}
-                  />
-                  <span className="truncate text-sm font-medium text-[#111827]">
-                    {item.name}
-                  </span>
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  <div
+                    className="flex h-10 w-10 items-center justify-center rounded-2xl"
+                    style={{ backgroundColor: `${item.fill}14`, color: item.fill }}
+                  >
+                    <Icon className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-[#111827]">
+                      {item.name}
+                    </p>
+                    <p className="mt-1 text-xs text-[#8A94A6]">
+                      {DESTINATION_HELPERS[item.name] ?? "destino operacional"}
+                    </p>
+                  </div>
                 </div>
-                <span className="shrink-0 text-sm font-semibold text-[#111827]">
+                <p className="text-2xl font-semibold tracking-tight text-[#111827]">
                   {formatNumber(item.value)}
-                </span>
+                </p>
               </div>
 
-              <div className="mt-3 h-2 overflow-hidden rounded-full bg-[#F3F4F6]">
+              <div className="mt-4 h-2.5 overflow-hidden rounded-full bg-[#F3F4F6]">
                 <div
                   className="h-full rounded-full"
                   style={{
@@ -97,9 +133,11 @@ export function PathPieChart({ data }: PathPieChartProps) {
                 />
               </div>
 
-              <div className="mt-2 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 text-xs text-[#6B7280]">
-                <span className="truncate">participação</span>
-                <span className="shrink-0">{formatPercent(share)}</span>
+              <div className="mt-2 flex items-center justify-between gap-2 text-xs text-[#6B7280]">
+                <span>participacao no periodo</span>
+                <span className="font-medium text-[#475569]">
+                  {formatPercent(share)}
+                </span>
               </div>
             </div>
           )
@@ -107,4 +145,10 @@ export function PathPieChart({ data }: PathPieChartProps) {
       </div>
     </div>
   )
+}
+
+function getDestinationIcon(name: string) {
+  if (name === "Fora do perfil") return BadgeAlert
+  if (name === "Encaminhado a parceiro") return Building2
+  return BriefcaseBusiness
 }

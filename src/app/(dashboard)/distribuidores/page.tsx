@@ -39,9 +39,9 @@ export default async function DistribuidoresPage({ searchParams }: Props) {
     <div className="space-y-6">
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         <SummaryCard
-          label="Leads enviados a distribuidores"
+          label="Leads encaminhados a parceiros"
           value={formatNumber(data.totalRedirections)}
-          helper="Quantidade de leads que foram direcionados para parceiros."
+          helper="Quantidade de leads direcionados para atendimento externo."
           accent="#D97706"
           icon={<Route className="h-4 w-4 text-[#D97706]" />}
         />
@@ -49,19 +49,19 @@ export default async function DistribuidoresPage({ searchParams }: Props) {
           label={
             params.estado
               ? `Recomendacoes em ${params.estado}`
-              : "Recomendacoes exibidas"
+              : "Recomendacoes na tela"
           }
           value={formatNumber(totalVisibleRecommendations)}
           helper={
             params.estado
               ? "Total de recomendacoes dentro do filtro atual."
-              : "Total de recomendacoes visiveis na tabela abaixo."
+              : "Total de indicacoes visiveis na tabela abaixo."
           }
           accent="#2563EB"
           icon={<Sparkles className="h-4 w-4 text-[#2563EB]" />}
         />
         <SummaryCard
-          label="Distribuidor lider"
+          label="Parceiro mais acionado"
           value={
             topDistributor
               ? formatNumber(topDistributor.timesRecommended)
@@ -70,7 +70,7 @@ export default async function DistribuidoresPage({ searchParams }: Props) {
           helper={
             topDistributor
               ? `${topDistributor.razao_social} - ${topDistributor.cidade}/${topDistributor.estado_uf}`
-              : "Nenhum distribuidor recomendado ainda."
+              : "Nenhum parceiro recomendado ainda."
           }
           accent="#059669"
           icon={<Building2 className="h-4 w-4 text-[#059669]" />}
@@ -93,7 +93,7 @@ export default async function DistribuidoresPage({ searchParams }: Props) {
           <div className="space-y-2">
             <div className="flex flex-wrap items-center gap-2">
               <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#8A94A6]">
-                Rede recomendada
+                Rede parceira
               </p>
               {params.estado ? (
                 <Badge
@@ -106,7 +106,7 @@ export default async function DistribuidoresPage({ searchParams }: Props) {
             </div>
             <div>
               <h2 className="text-base font-medium text-[#111827]">
-                Distribuidores mais recomendados
+                Parceiros mais acionados
               </h2>
               <p className="mt-1 max-w-3xl text-sm text-[#6B7280]">
                 A tabela mostra quais parceiros receberam mais indicacoes, em
@@ -141,8 +141,8 @@ export default async function DistribuidoresPage({ searchParams }: Props) {
                 Nenhuma recomendacao registrada
               </p>
               <p className="max-w-sm text-sm text-[#6B7280]">
-                Quando a operacao recomendar distribuidores, a concentracao por
-                cidade, estado e recorrencia aparecerao aqui.
+                Quando a operacao encaminhar leads para parceiros, a
+                concentracao por cidade, estado e recorrencia aparecera aqui.
               </p>
             </div>
           </div>
@@ -155,7 +155,7 @@ export default async function DistribuidoresPage({ searchParams }: Props) {
                     Rank
                   </th>
                   <th className="w-[31%] px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-[0.18em] text-[#8A94A6]">
-                    Distribuidor
+                    Parceiro
                   </th>
                   <th className="w-[18%] px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-[0.18em] text-[#8A94A6]">
                     Cidade / estado

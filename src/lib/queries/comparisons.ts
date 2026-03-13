@@ -24,28 +24,28 @@ export async function comparePeriods(
 
   return [
     {
-      label: "Total Leads",
+      label: "Entradas",
       periodA: statsA.total,
       periodB: statsB.total,
       delta: delta(statsA.total, statsB.total),
       format: "number",
     },
     {
-      label: "Qualificados (P3)",
+      label: "Atendimento interno",
       periodA: statsA.qualified,
       periodB: statsB.qualified,
       delta: delta(statsA.qualified, statsB.qualified),
       format: "number",
     },
     {
-      label: "Handoffs",
+      label: "Transferidos ao vendedor",
       periodA: statsA.handoff,
       periodB: statsB.handoff,
       delta: delta(statsA.handoff, statsB.handoff),
       format: "number",
     },
     {
-      label: "Taxa de Handoff",
+      label: "Taxa de transferencia",
       periodA: statsA.total > 0 ? Math.round((statsA.handoff / statsA.total) * 1000) / 10 : 0,
       periodB: statsB.total > 0 ? Math.round((statsB.handoff / statsB.total) * 1000) / 10 : 0,
       delta: delta(
@@ -55,14 +55,14 @@ export async function comparePeriods(
       format: "percent",
     },
     {
-      label: "Score Médio",
+      label: "Pontuacao media",
       periodA: statsA.avgScore,
       periodB: statsB.avgScore,
       delta: delta(statsA.avgScore, statsB.avgScore),
       format: "number",
     },
     {
-      label: "Desqualificados (P1)",
+      label: "Fora do perfil",
       periodA: statsA.disqualified,
       periodB: statsB.disqualified,
       delta: delta(statsA.disqualified, statsB.disqualified),
