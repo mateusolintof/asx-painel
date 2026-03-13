@@ -25,7 +25,7 @@ Painel de gestao para a equipe da **ASX Iluminacao Automotiva** acompanhar leads
 | `/vendedores` | Vendedores | Performance de cada vendedor (leads, scores) |
 | `/distribuidores` | Distribuidores | Recomendacoes feitas para leads Path 2 |
 | `/comparativos` | Comparativos | Semana/Mes atual vs anterior |
-| `/leads-quentes` | Leads Quentes | Leads Path 3 parados que precisam de atencao |
+| `/leads-quentes` | Leads Quentes | Leads classificados como quentes em acompanhamento prioritario |
 
 ## Como rodar
 

@@ -83,8 +83,8 @@ export default async function OverviewPage({ searchParams }: Props) {
         ))}
       </div>
 
-      <div className="grid grid-cols-1 gap-4 xl:grid-cols-[minmax(0,1.8fr)_minmax(320px,0.95fr)]">
-        <Card className="col-span-1 border border-[#E5E7EB] bg-white px-4 md:px-5">
+      <div className="grid grid-cols-1 gap-4 xl:grid-cols-[minmax(0,1.45fr)_minmax(400px,1fr)]">
+        <Card className="col-span-1 min-w-0 border border-[#E5E7EB] bg-white px-4 md:px-5">
           <div className="space-y-1">
             <h2 className="text-base font-medium text-[#111827]">
               Leads nos ultimos {daysInRange} dias
@@ -97,7 +97,7 @@ export default async function OverviewPage({ searchParams }: Props) {
           <TrendLine data={trend} />
         </Card>
 
-        <Card className="border border-[#E5E7EB] bg-white px-4 md:px-5">
+        <Card className="min-w-0 border border-[#E5E7EB] bg-white px-4 md:px-5">
           <div className="space-y-1">
             <h2 className="text-base font-medium text-[#111827]">
               Distribuicao por Path
@@ -111,7 +111,7 @@ export default async function OverviewPage({ searchParams }: Props) {
         </Card>
       </div>
 
-      <Card className="border border-[#E5E7EB] bg-white px-4 md:px-5">
+      <Card className="min-w-0 border border-[#E5E7EB] bg-white px-4 md:px-5">
         <div className="space-y-1">
           <h2 className="text-base font-medium text-[#111827]">
             Funil Principal (Path 3)

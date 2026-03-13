@@ -39,19 +39,23 @@ export default async function DistribuidoresPage({ searchParams }: Props) {
     <div className="space-y-6">
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         <SummaryCard
-          label="Path 2 encaminhados"
+          label="Leads enviados a distribuidores"
           value={formatNumber(data.totalRedirections)}
-          helper="Leads desviados para distribuidores no historico visivel."
+          helper="Quantidade de leads que foram direcionados para parceiros."
           accent="#D97706"
           icon={<Route className="h-4 w-4 text-[#D97706]" />}
         />
         <SummaryCard
-          label={params.estado ? `Carga em ${params.estado}` : "Carga exibida"}
+          label={
+            params.estado
+              ? `Recomendacoes em ${params.estado}`
+              : "Recomendacoes exibidas"
+          }
           value={formatNumber(totalVisibleRecommendations)}
           helper={
             params.estado
-              ? "Recomendacoes concentradas no filtro atual."
-              : "Volume da tabela atual para leitura de cobertura."
+              ? "Total de recomendacoes dentro do filtro atual."
+              : "Total de recomendacoes visiveis na tabela abaixo."
           }
           accent="#2563EB"
           icon={<Sparkles className="h-4 w-4 text-[#2563EB]" />}
@@ -72,12 +76,12 @@ export default async function DistribuidoresPage({ searchParams }: Props) {
           icon={<Building2 className="h-4 w-4 text-[#059669]" />}
         />
         <SummaryCard
-          label="Cobertura ativa"
+          label="Estados atendidos"
           value={formatNumber(coveredStates || data.availableStates.length)}
           helper={
             topState
-              ? `${topState[0]} concentra ${formatNumber(topState[1])} recomendacoes.`
-              : "Rede sem recorrencia de recomendacoes."
+              ? `${topState[0]} recebeu ${formatNumber(topState[1])} recomendacoes.`
+              : "Ainda nao ha recorrencia suficiente para destacar um estado."
           }
           accent="#B2121A"
           icon={<MapPinned className="h-4 w-4 text-[#B2121A]" />}
@@ -102,12 +106,11 @@ export default async function DistribuidoresPage({ searchParams }: Props) {
             </div>
             <div>
               <h2 className="text-base font-medium text-[#111827]">
-                Distribuidores mais acionados pela operacao
+                Distribuidores mais recomendados
               </h2>
               <p className="mt-1 max-w-3xl text-sm text-[#6B7280]">
-                A tabela destaca frequencia de recomendacao, cobertura regional e
-                recencia para facilitar ajuste de estoque, rota e handoff de Path
-                2.
+                A tabela mostra quais parceiros receberam mais indicacoes, em
+                quais estados atuam e quando foram acionados pela ultima vez.
               </p>
             </div>
           </div>
@@ -139,7 +142,7 @@ export default async function DistribuidoresPage({ searchParams }: Props) {
               </p>
               <p className="max-w-sm text-sm text-[#6B7280]">
                 Quando a operacao recomendar distribuidores, a concentracao por
-                praca e a recorrencia aparecerao aqui.
+                cidade, estado e recorrencia aparecerao aqui.
               </p>
             </div>
           </div>
@@ -155,16 +158,16 @@ export default async function DistribuidoresPage({ searchParams }: Props) {
                     Distribuidor
                   </th>
                   <th className="w-[18%] px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-[0.18em] text-[#8A94A6]">
-                    Praca
+                    Cidade / estado
                   </th>
                   <th className="w-[16%] px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-[0.18em] text-[#8A94A6]">
-                    Tipo
+                    Categoria
                   </th>
                   <th className="w-[21%] px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-[0.18em] text-[#8A94A6]">
-                    Peso operacional
+                    Recomendacoes recebidas
                   </th>
                   <th className="w-[14%] px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-[0.18em] text-[#8A94A6]">
-                    Ultima recomendacao
+                    Ultima indicacao
                   </th>
                 </tr>
               </thead>
@@ -206,8 +209,8 @@ export default async function DistribuidoresPage({ searchParams }: Props) {
                             ) : null}
                           </div>
                           <p className="text-xs text-[#8A94A6]">
-                            {shareOfVisible.toFixed(1)}% da carga visivel de
-                            recomendacoes
+                            {shareOfVisible.toFixed(1)}% das recomendacoes
+                            exibidas
                           </p>
                         </div>
                       </td>

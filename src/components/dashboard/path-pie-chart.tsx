@@ -19,9 +19,9 @@ export function PathPieChart({ data }: PathPieChartProps) {
   }
 
   return (
-    <div className="grid gap-4 xl:grid-cols-[220px_minmax(0,1fr)] xl:items-center">
-      <div className="relative mx-auto h-[220px] w-full max-w-[220px]">
-        <ResponsiveContainer width="100%" height="100%">
+    <div className="grid gap-4 2xl:grid-cols-[220px_minmax(0,1fr)] 2xl:items-center">
+      <div className="relative mx-auto h-[220px] w-full min-w-0 max-w-[220px]">
+        <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={220}>
           <PieChart>
             <Pie
               data={data}
@@ -72,17 +72,17 @@ export function PathPieChart({ data }: PathPieChartProps) {
               key={item.name}
               className="rounded-2xl border border-[#E5E7EB] bg-white/70 p-3"
             >
-              <div className="flex items-center justify-between gap-3">
-                <div className="flex items-center gap-2">
+              <div className="flex min-w-0 items-center justify-between gap-3">
+                <div className="flex min-w-0 items-center gap-2">
                   <span
                     className="h-2.5 w-2.5 rounded-full"
                     style={{ backgroundColor: item.fill }}
                   />
-                  <span className="text-sm font-medium text-[#111827]">
+                  <span className="truncate text-sm font-medium text-[#111827]">
                     {item.name}
                   </span>
                 </div>
-                <span className="text-sm font-semibold text-[#111827]">
+                <span className="shrink-0 text-sm font-semibold text-[#111827]">
                   {formatNumber(item.value)}
                 </span>
               </div>
@@ -97,9 +97,9 @@ export function PathPieChart({ data }: PathPieChartProps) {
                 />
               </div>
 
-              <div className="mt-2 flex items-center justify-between text-xs text-[#6B7280]">
-                <span>participação</span>
-                <span>{formatPercent(share)}</span>
+              <div className="mt-2 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 text-xs text-[#6B7280]">
+                <span className="truncate">participação</span>
+                <span className="shrink-0">{formatPercent(share)}</span>
               </div>
             </div>
           )

@@ -35,7 +35,7 @@ export default async function LeadsQuentesPage({ searchParams }: Props) {
                 ha mais de 24h
               </p>
               <p className="text-xs text-[#B2121A]/80">
-                Priorize retorno rapido ou transferencia para vendedor.
+                Priorize retorno rapido ou acione o vendedor responsavel.
               </p>
             </div>
           </div>
@@ -43,12 +43,12 @@ export default async function LeadsQuentesPage({ searchParams }: Props) {
 
         <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
           <SummaryCard
-            title="Na fila agora"
+            title="Em acompanhamento"
             value={hotLeads.length}
             accentClass="border-l-[#B2121A]"
           />
           <SummaryCard
-            title="Urgentes"
+            title="Prioridade maxima"
             value={urgent.length}
             accentClass="border-l-[#EF4444]"
             icon={<Flame className="h-4 w-4 text-[#EF4444]" />}

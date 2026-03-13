@@ -34,7 +34,7 @@ const PAGE_META: Record<string, { title: string; hint: string }> = {
   },
   "/leads-quentes": {
     title: "Leads Quentes",
-    hint: "Fila imediata de atendimento",
+    hint: "Monitoramento prioritario apos handoff",
   },
 }
 

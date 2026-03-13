@@ -52,77 +52,83 @@ export function TrendLine({ data }: TrendLineProps) {
         />
       </div>
 
-      <ResponsiveContainer width="100%" height={268}>
-        <ComposedChart data={formatted} margin={{ top: 6, right: 8, left: -12, bottom: 0 }}>
-          <defs>
-            <linearGradient id="trend-total" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#B2121A" stopOpacity={0.18} />
-              <stop offset="100%" stopColor="#B2121A" stopOpacity={0} />
-            </linearGradient>
-          </defs>
+      <div className="h-[268px] min-w-0">
+        <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={268}>
+          <ComposedChart data={formatted} margin={{ top: 6, right: 8, left: -12, bottom: 0 }}>
+            <defs>
+              <linearGradient id="trend-total" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#B2121A" stopOpacity={0.18} />
+                <stop offset="100%" stopColor="#B2121A" stopOpacity={0} />
+              </linearGradient>
+            </defs>
 
-          <CartesianGrid vertical={false} stroke="#E5E7EB" strokeDasharray="2 6" />
+            <CartesianGrid vertical={false} stroke="#E5E7EB" strokeDasharray="2 6" />
 
-          <XAxis
-            dataKey="dayLabel"
-            tick={{ fontSize: 11, fill: "#94A3B8" }}
-            axisLine={false}
-            tickLine={false}
-            tickMargin={12}
-            minTickGap={24}
-          />
-          <YAxis
-            width={26}
-            allowDecimals={false}
-            tick={{ fontSize: 11, fill: "#94A3B8" }}
-            axisLine={false}
-            tickLine={false}
-          />
+            <XAxis
+              dataKey="dayLabel"
+              tick={{ fontSize: 11, fill: "#94A3B8" }}
+              axisLine={false}
+              tickLine={false}
+              tickMargin={12}
+              minTickGap={24}
+            />
+            <YAxis
+              width={26}
+              allowDecimals={false}
+              tick={{ fontSize: 11, fill: "#94A3B8" }}
+              axisLine={false}
+              tickLine={false}
+            />
 
-          <Tooltip
-            cursor={{ stroke: "#CBD5E1", strokeDasharray: "4 4" }}
-            content={({ active, payload, label }) => {
-              if (!active || !payload?.length) return null
+            <Tooltip
+              cursor={{ stroke: "#CBD5E1", strokeDasharray: "4 4" }}
+              content={({ active, payload, label }) => {
+                if (!active || !payload?.length) return null
 
-              const totalLeads = Number(payload.find((item) => item.dataKey === "total_leads")?.value ?? 0)
-              const qualified = Number(payload.find((item) => item.dataKey === "path3_qualified")?.value ?? 0)
+                const totalLeads = Number(
+                  payload.find((item) => item.dataKey === "total_leads")?.value ?? 0
+                )
+                const qualified = Number(
+                  payload.find((item) => item.dataKey === "path3_qualified")?.value ?? 0
+                )
 
-              return (
-                <div className="min-w-40 rounded-2xl border border-[#E5E7EB] bg-white px-3 py-2.5 text-sm text-[#111827] shadow-[0_10px_30px_rgba(15,23,42,0.08)]">
-                  <p className="text-xs font-medium uppercase tracking-[0.14em] text-[#94A3B8]">
-                    {label}
-                  </p>
-                  <div className="mt-2 space-y-1.5">
-                    <TooltipRow color="#B2121A" label="Total Leads" value={totalLeads} />
-                    <TooltipRow color="#059669" label="Qualificados" value={qualified} />
+                return (
+                  <div className="min-w-40 rounded-2xl border border-[#E5E7EB] bg-white px-3 py-2.5 text-sm text-[#111827] shadow-[0_10px_30px_rgba(15,23,42,0.08)]">
+                    <p className="text-xs font-medium uppercase tracking-[0.14em] text-[#94A3B8]">
+                      {label}
+                    </p>
+                    <div className="mt-2 space-y-1.5">
+                      <TooltipRow color="#B2121A" label="Total Leads" value={totalLeads} />
+                      <TooltipRow color="#059669" label="Qualificados" value={qualified} />
+                    </div>
                   </div>
-                </div>
-              )
-            }}
-          />
+                )
+              }}
+            />
 
-          <Area
-            type="monotone"
-            dataKey="total_leads"
-            stroke="#B2121A"
-            strokeWidth={2.25}
-            fill="url(#trend-total)"
-            dot={false}
-            activeDot={{ r: 4, fill: "#B2121A", stroke: "#fff", strokeWidth: 2 }}
-            name="Total Leads"
-          />
-          <Line
-            type="monotone"
-            dataKey="path3_qualified"
-            stroke="#059669"
-            strokeWidth={2}
-            strokeDasharray="5 5"
-            dot={{ r: 2.5, fill: "#059669", strokeWidth: 0 }}
-            activeDot={{ r: 4, fill: "#059669", stroke: "#fff", strokeWidth: 2 }}
-            name="Qualificados"
-          />
-        </ComposedChart>
-      </ResponsiveContainer>
+            <Area
+              type="monotone"
+              dataKey="total_leads"
+              stroke="#B2121A"
+              strokeWidth={2.25}
+              fill="url(#trend-total)"
+              dot={false}
+              activeDot={{ r: 4, fill: "#B2121A", stroke: "#fff", strokeWidth: 2 }}
+              name="Total Leads"
+            />
+            <Line
+              type="monotone"
+              dataKey="path3_qualified"
+              stroke="#059669"
+              strokeWidth={2}
+              strokeDasharray="5 5"
+              dot={{ r: 2.5, fill: "#059669", strokeWidth: 0 }}
+              activeDot={{ r: 4, fill: "#059669", stroke: "#fff", strokeWidth: 2 }}
+              name="Qualificados"
+            />
+          </ComposedChart>
+        </ResponsiveContainer>
+      </div>
     </div>
   )
 }

@@ -332,7 +332,7 @@ Arquivo de referencia: `.interface-design/system.md`
    - Funil de conversao
    - Tabela de leads com filtros
    - Performance por vendedor
-   - Leads quentes parados
+   - Leads classificados como quentes em acompanhamento prioritario
    - Comparativos entre periodos
 ```
 

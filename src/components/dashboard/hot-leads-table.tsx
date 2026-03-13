@@ -258,7 +258,7 @@ export function HotLeadsTable({
               Acompanhamento de leads quentes
             </p>
             <p className="text-xs text-[#6B7280]">
-              Ordene por prioridade ou espera e abra o lead sem sair da fila.
+              Ordene por prioridade ou espera e abra o lead sem sair da lista.
             </p>
           </div>
 
@@ -339,7 +339,7 @@ export function HotLeadsTable({
                     colSpan={columns.length}
                     className="px-4 py-10 text-center text-sm text-[#6B7280]"
                   >
-                    Nenhum lead quente encontrado.
+                    Nenhum lead quente em acompanhamento.
                   </td>
                 </tr>
               ) : (
