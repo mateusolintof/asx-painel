@@ -1,7 +1,7 @@
 export const PATH_LABELS: Record<number, string> = {
   1: "Fora do perfil",
-  2: "Encaminhado a parceiro",
-  3: "Atendimento interno",
+  2: "Rede parceira",
+  3: "Operacao ASX",
 }
 
 export const PATH_COLORS: Record<number, string> = {
@@ -11,10 +11,10 @@ export const PATH_COLORS: Record<number, string> = {
 }
 
 export const STATUS_LABELS: Record<string, string> = {
-  pending: "Pendente",
-  contacted: "Contatado",
-  in_conversation: "Em conversa",
-  handoff_done: "Transferido",
+  pending: "Aguardando contato",
+  contacted: "Primeiro contato feito",
+  in_conversation: "Em atendimento",
+  handoff_done: "Com vendedor",
   disqualified_cnpj: "CNPJ inválido",
   disqualified_policy: "Política interna",
   send_failed: "Falha no envio",
@@ -66,11 +66,11 @@ export const SELLERS = [
 ]
 
 export const NAV_ITEMS = [
-  { label: "Visão Geral", href: "/", icon: "LayoutDashboard" },
+  { label: "Resumo Executivo", href: "/", icon: "LayoutDashboard" },
   { label: "Leads", href: "/leads", icon: "Users" },
-  { label: "Funil", href: "/funil", icon: "Filter" },
-  { label: "Vendedores", href: "/vendedores", icon: "UserCheck" },
-  { label: "Distribuidores", href: "/distribuidores", icon: "Building2" },
-  { label: "Comparativos", href: "/comparativos", icon: "BarChart3" },
-  { label: "Leads Quentes", href: "/leads-quentes", icon: "Flame" },
+  { label: "Jornada Comercial", href: "/funil", icon: "Filter" },
+  { label: "Equipe Comercial", href: "/vendedores", icon: "UserCheck" },
+  { label: "Rede Parceira", href: "/distribuidores", icon: "Building2" },
+  { label: "Comparativo de Periodos", href: "/comparativos", icon: "BarChart3" },
+  { label: "Prioridades Comerciais", href: "/leads-quentes", icon: "Flame" },
 ] as const

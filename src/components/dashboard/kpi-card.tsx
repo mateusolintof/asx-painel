@@ -1,7 +1,13 @@
 import { Card } from "@/components/ui/card"
+import { BusinessDisclaimer } from "@/components/dashboard/business-disclaimer"
 import { cn } from "@/lib/utils"
 import { TrendingUp, TrendingDown, Minus } from "lucide-react"
 import { formatNumber, formatPercent, formatCurrency, calcDelta } from "@/lib/utils/format"
+
+interface DisclaimerSection {
+  label: string
+  content: string
+}
 
 interface KPICardProps {
   label: string
@@ -9,6 +15,11 @@ interface KPICardProps {
   previousValue?: number
   format?: "number" | "percent" | "currency"
   accentColor?: string
+  disclaimer?: {
+    title: string
+    description?: string
+    sections: DisclaimerSection[]
+  }
 }
 
 export function KPICard({
@@ -17,6 +28,7 @@ export function KPICard({
   previousValue,
   format = "number",
   accentColor = "#B2121A",
+  disclaimer,
 }: KPICardProps) {
   const formatted =
     format === "percent"
@@ -43,21 +55,24 @@ export function KPICard({
           </p>
         </div>
 
-        {delta !== null && (
-          <div
-            className={cn(
-              "shrink-0 flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-medium",
-              delta > 0 && "bg-emerald-50 text-emerald-700",
-              delta < 0 && "bg-red-50 text-red-700",
-              delta === 0 && "bg-gray-50 text-gray-600"
-            )}
-          >
-            {delta > 0 && <TrendingUp className="h-3 w-3" />}
-            {delta < 0 && <TrendingDown className="h-3 w-3" />}
-            {delta === 0 && <Minus className="h-3 w-3" />}
-            {deltaFormatted}
-          </div>
-        )}
+        <div className="flex items-start gap-2">
+          {disclaimer ? <BusinessDisclaimer {...disclaimer} /> : null}
+          {delta !== null && (
+            <div
+              className={cn(
+                "shrink-0 flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-medium",
+                delta > 0 && "bg-emerald-50 text-emerald-700",
+                delta < 0 && "bg-red-50 text-red-700",
+                delta === 0 && "bg-gray-50 text-gray-600"
+              )}
+            >
+              {delta > 0 && <TrendingUp className="h-3 w-3" />}
+              {delta < 0 && <TrendingDown className="h-3 w-3" />}
+              {delta === 0 && <Minus className="h-3 w-3" />}
+              {deltaFormatted}
+            </div>
+          )}
+        </div>
       </div>
     </Card>
   )

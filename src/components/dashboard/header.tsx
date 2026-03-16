@@ -9,32 +9,32 @@ import { useDashboardShell } from "@/components/dashboard/dashboard-shell-contex
 
 const PAGE_META: Record<string, { title: string; hint: string }> = {
   "/": {
-    title: "Visão Geral",
-    hint: "Resumo da temperatura da operação",
+    title: "Resumo Executivo",
+    hint: "Leitura rápida da operação comercial",
   },
   "/leads": {
     title: "Leads",
-    hint: "Busca, triagem e acompanhamento",
+    hint: "Base completa para busca e acompanhamento",
   },
   "/funil": {
-    title: "Funil",
-    hint: "Conversão por etapa do processo",
+    title: "Jornada Comercial",
+    hint: "Avanco da base da entrada ate o vendedor",
   },
   "/vendedores": {
-    title: "Vendedores",
-    hint: "Carteira, distribuicao e desempenho",
+    title: "Equipe Comercial",
+    hint: "Carteira, qualidade e distribuicao por vendedor",
   },
   "/distribuidores": {
-    title: "Distribuidores",
-    hint: "Rede parceira por regiao",
+    title: "Rede Parceira",
+    hint: "Acionamento dos parceiros por regiao",
   },
   "/comparativos": {
-    title: "Comparativos",
-    hint: "Leitura temporal da operação",
+    title: "Comparativo de Periodos",
+    hint: "Evolucao da operacao entre recortes",
   },
   "/leads-quentes": {
-    title: "Leads Quentes",
-    hint: "Monitoramento prioritario apos a transferencia",
+    title: "Prioridades Comerciais",
+    hint: "Fila das oportunidades mais sensiveis",
   },
 }
 

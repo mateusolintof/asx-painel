@@ -1,5 +1,6 @@
 import type { ReactNode } from "react"
 import { AlertTriangle, Flame, UserRound } from "lucide-react"
+import { BusinessDisclaimer } from "@/components/dashboard/business-disclaimer"
 import { Card } from "@/components/ui/card"
 import { getLeadById } from "@/lib/queries/leads"
 import { getHotLeads } from "@/lib/queries/hot-leads"
@@ -43,18 +44,18 @@ export default async function LeadsQuentesPage({ searchParams }: Props) {
 
         <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
           <SummaryCard
-            title="Em acompanhamento"
+            title="Fila prioritaria"
             value={hotLeads.length}
             accentClass="border-l-[#B2121A]"
           />
           <SummaryCard
-            title="Prioridade maxima"
+            title="Maxima prioridade"
             value={urgent.length}
             accentClass="border-l-[#EF4444]"
             icon={<Flame className="h-4 w-4 text-[#EF4444]" />}
           />
           <SummaryCard
-            title="Com vendedor"
+            title="Ja com vendedor"
             value={assigned.length}
             accentClass="border-l-[#D97706]"
             icon={<UserRound className="h-4 w-4 text-[#D97706]" />}
@@ -98,11 +99,74 @@ function SummaryCard({
   accentClass: string
   icon?: ReactNode
 }) {
+  const disclaimerMap: Record<
+    string,
+    {
+      title: string
+      description: string
+      sections: { label: string; content: string }[]
+    }
+  > = {
+    "Fila prioritaria": {
+      title: "Fila prioritaria",
+      description: "Total de leads quentes monitorados nesta fila.",
+      sections: [
+        {
+          label: "O que entra na conta",
+          content:
+            "Leads classificados como quentes, com maior prioridade comercial, reunidos para acompanhamento do time.",
+        },
+        {
+          label: "Na prática",
+          content:
+            "É a fila de oportunidades mais sensíveis, que exige velocidade de resposta e gestão mais próxima.",
+        },
+      ],
+    },
+    "Maxima prioridade": {
+      title: "Maxima prioridade",
+      description: "Subset dos leads quentes marcados com urgência máxima.",
+      sections: [
+        {
+          label: "O que entra na conta",
+          content:
+            "Leads quentes cuja prioridade está marcada como 'urgent' dentro da qualificação.",
+        },
+        {
+          label: "Na prática",
+          content:
+            "Representa o grupo que deveria receber atenção primeiro, por potencial comercial e risco de esfriamento se houver demora.",
+        },
+      ],
+    },
+    "Ja com vendedor": {
+      title: "Ja com vendedor",
+      description: "Leads quentes que já têm responsável comercial definido.",
+      sections: [
+        {
+          label: "O que entra na conta",
+          content:
+            "Leads quentes que já passaram por atribuição e hoje têm um vendedor vinculado.",
+        },
+        {
+          label: "Na prática",
+          content:
+            "Ajuda a separar o que já está oficialmente na carteira comercial do que ainda depende de encaminhamento ou dono claro.",
+        },
+      ],
+    },
+  }
+
   return (
     <Card className={`border border-[#E5E7EB] border-l-4 bg-white p-4 ${accentClass}`}>
       <div className="flex items-center gap-2 text-sm text-[#6B7280]">
         {icon}
         <span>{title}</span>
+        <BusinessDisclaimer
+          {...disclaimerMap[title]}
+          side="bottom"
+          align="start"
+        />
       </div>
       <p className="mt-2 text-3xl font-semibold tracking-tight text-[#111827]">
         {value}

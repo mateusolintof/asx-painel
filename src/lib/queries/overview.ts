@@ -16,13 +16,13 @@ export async function getKPIs(current: DateRange, previous: DateRange): Promise<
       format: "number",
     },
     {
-      label: "Atendimento interno",
+      label: "Operacao ASX",
       value: currentData.qualified,
       previousValue: previousData.qualified,
       format: "number",
     },
     {
-      label: "Taxa de transferencia",
+      label: "Repasse ao vendedor",
       value: currentData.total > 0
         ? (currentData.handoff / currentData.total) * 100
         : 0,
@@ -32,7 +32,7 @@ export async function getKPIs(current: DateRange, previous: DateRange): Promise<
       format: "percent",
     },
     {
-      label: "Pontuacao media",
+      label: "Qualidade media",
       value: currentData.avgScore,
       previousValue: previousData.avgScore,
       format: "number",
@@ -138,8 +138,8 @@ export async function getPathDistribution(period?: DateRange) {
   const rows = data ?? []
   return [
     { name: "Fora do perfil", value: rows.filter((r) => r.path === 1).length, fill: "#ef4444" },
-    { name: "Encaminhado a parceiro", value: rows.filter((r) => r.path === 2).length, fill: "#f59e0b" },
-    { name: "Atendimento interno", value: rows.filter((r) => r.path === 3).length, fill: "#10b981" },
+    { name: "Rede parceira", value: rows.filter((r) => r.path === 2).length, fill: "#f59e0b" },
+    { name: "Operacao ASX", value: rows.filter((r) => r.path === 3).length, fill: "#10b981" },
   ]
 }
 

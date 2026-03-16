@@ -1,4 +1,5 @@
 import { UserCheck } from "lucide-react"
+import { BusinessDisclaimer } from "@/components/dashboard/business-disclaimer"
 import { Badge } from "@/components/ui/badge"
 import { Card } from "@/components/ui/card"
 import { getSellerPerformance } from "@/lib/queries/sellers"
@@ -29,20 +30,71 @@ export default async function VendedoresPage() {
   return (
     <div className="space-y-6">
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        <SummaryCard label="Vendedores ativos" value={formatNumber(sellers.length)} />
         <SummaryCard
-          label="Leads distribuidos"
-          value={formatNumber(totalAssigned)}
-          accent="#D97706"
+          label="Vendedores ativos"
+          value={formatNumber(sellers.length)}
+          disclaimer={{
+            title: "Vendedores ativos",
+            description: "Quantidade de vendedores cadastrados e exibidos nesta visão.",
+            sections: [
+              {
+                label: "O que entra na conta",
+                content:
+                  "Os vendedores cadastrados na base e reconhecidos pelo painel como responsáveis por carteira.",
+              },
+              {
+                label: "Na prática",
+                content:
+                  "Serve como referência da capacidade comercial disponível para absorver e trabalhar os handoffs.",
+              },
+            ],
+          }}
         />
         <SummaryCard
-          label="Leads quentes em carteira"
+          label="Leads repassados"
+          value={formatNumber(totalAssigned)}
+          accent="#D97706"
+          disclaimer={{
+            title: "Leads distribuídos",
+            description: "Total de oportunidades já repassadas aos vendedores.",
+            sections: [
+              {
+                label: "O que entra na conta",
+                content:
+                  "Cada lead que já recebeu uma atribuição formal para algum vendedor.",
+              },
+              {
+                label: "Na prática",
+                content:
+                  "Mostra o tamanho da carteira já colocada na mão do time comercial.",
+              },
+            ],
+          }}
+        />
+        <SummaryCard
+          label="Oportunidades quentes"
           value={formatNumber(hottestLeads)}
           accent="#059669"
           helper={`pontuacao media geral ${formatNumber(avgScore)}`}
+          disclaimer={{
+            title: "Leads quentes em carteira",
+            description: "Volume de oportunidades com maior prioridade comercial.",
+            sections: [
+              {
+                label: "O que entra na conta",
+                content:
+                  "Leads atribuídos aos vendedores cuja classificação de score é 'quente'.",
+              },
+              {
+                label: "Na prática",
+                content:
+                  "Esse número mostra o tamanho da carteira mais sensível e com maior potencial de fechamento.",
+              },
+            ],
+          }}
         />
         <SummaryCard
-          label="Carteira lider"
+          label="Maior carteira"
           value={formatNumber(topSeller?.totalLeads ?? 0)}
           accent="#2563EB"
           helper={
@@ -50,6 +102,22 @@ export default async function VendedoresPage() {
               ? `${topSeller.name} concentra a maior carteira atual`
               : "Ainda nao existe carteira com volume relevante"
           }
+          disclaimer={{
+            title: "Carteira líder",
+            description: "Maior carteira entre os vendedores ativos.",
+            sections: [
+              {
+                label: "O que entra na conta",
+                content:
+                  "O painel identifica qual vendedor recebeu mais leads no histórico de atribuições.",
+              },
+              {
+                label: "Na prática",
+                content:
+                  "Ajuda a enxergar concentração de carteira e eventual desequilíbrio de distribuição entre vendedores.",
+              },
+            ],
+          }}
         />
       </div>
 
@@ -107,24 +175,59 @@ export default async function VendedoresPage() {
                     value={formatNumber(seller.avgScore)}
                   />
                   <MetricCell
-                    label="Classe dominante"
+                    label="Temperatura predominante"
                     value={
                       topScore && topScore.count > 0
                         ? SCORE_LABELS[topScore.class]
                         : "Sem classificacao"
                     }
+                    disclaimer={{
+                      title: "Temperatura predominante",
+                      description: "Faixa de qualidade mais frequente na carteira do vendedor.",
+                      sections: [
+                        {
+                          label: "Como é calculada",
+                          content:
+                            "O painel compara quantos leads quentes, mornos e frios existem na carteira desse vendedor e destaca a faixa com maior volume.",
+                        },
+                        {
+                          label: "Na prática",
+                          content:
+                            "Mostra o perfil comercial mais comum da carteira atual. Exemplo: se predomina 'morno', o vendedor está operando mais oportunidades de desenvolvimento do que urgências imediatas.",
+                        },
+                      ],
+                    }}
                   />
                 </div>
 
                 <div className="mt-4 rounded-2xl border border-[#E5E7EB] bg-[#FCFCFD] p-3">
                   <div className="flex items-center justify-between gap-3">
                     <div>
-                      <p className="text-sm font-medium text-[#111827]">
-                        Distribuicao por temperatura
-                      </p>
+                      <div className="flex items-center gap-2">
+                        <p className="text-sm font-medium text-[#111827]">
+                        Qualidade da carteira
+                        </p>
+                        <BusinessDisclaimer
+                          title="Qualidade da carteira"
+                          description="Composicao da carteira do vendedor por nivel de qualidade do lead."
+                          sections={[
+                            {
+                              label: "O que entra na conta",
+                              content:
+                                "A distribuição usa os scores dos leads já atribuídos ao vendedor e separa entre quente, morno e frio.",
+                            },
+                            {
+                              label: "Na prática",
+                              content:
+                                "Ajuda a avaliar se a carteira está mais pesada em urgências, em oportunidades para nutrir ou em leads com menor probabilidade de avanço.",
+                            },
+                          ]}
+                          side="left"
+                        />
+                      </div>
                       <p className="mt-1 text-xs text-[#6B7280]">
-                        Como a carteira atual se distribui entre quente, morno e
-                        frio.
+                        Como a carteira atual se divide entre oportunidades
+                        quentes, mornas e frias.
                       </p>
                     </div>
                     <div className="text-xs font-medium text-[#6B7280]">
@@ -195,16 +298,25 @@ function SummaryCard({
   value,
   helper,
   accent = "#B2121A",
+  disclaimer,
 }: {
   label: string
   value: string
   helper?: string
   accent?: string
+  disclaimer?: {
+    title: string
+    description?: string
+    sections: { label: string; content: string }[]
+  }
 }) {
   return (
     <Card className="rounded-2xl border border-[#E5E7EB] bg-white p-4">
       <div className="h-1.5 rounded-full" style={{ backgroundColor: accent }} />
-      <p className="mt-3 text-sm text-[#6B7280]">{label}</p>
+      <div className="mt-3 flex items-center gap-2">
+        <p className="text-sm text-[#6B7280]">{label}</p>
+        {disclaimer ? <BusinessDisclaimer {...disclaimer} /> : null}
+      </div>
       <p className="mt-1 text-3xl font-semibold tracking-tight text-[#111827]">
         {value}
       </p>
@@ -215,12 +327,34 @@ function SummaryCard({
   )
 }
 
-function MetricCell({ label, value }: { label: string; value: string }) {
+function MetricCell({
+  label,
+  value,
+  disclaimer,
+}: {
+  label: string
+  value: string
+  disclaimer?: {
+    title: string
+    description?: string
+    sections: { label: string; content: string }[]
+  }
+}) {
   return (
     <div className="rounded-2xl border border-[#E5E7EB] bg-[#FCFCFB] px-3 py-3">
-      <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-[#8A94A6]">
-        {label}
-      </p>
+      <div className="flex items-center gap-2">
+        <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-[#8A94A6]">
+          {label}
+        </p>
+        {disclaimer ? (
+          <BusinessDisclaimer
+            {...disclaimer}
+            side="bottom"
+            align="start"
+            className="h-6 w-6"
+          />
+        ) : null}
+      </div>
       <p className="mt-1 text-xl font-semibold tracking-tight text-[#111827]">
         {value}
       </p>

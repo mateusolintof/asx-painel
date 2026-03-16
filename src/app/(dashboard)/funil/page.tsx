@@ -1,4 +1,5 @@
 import { Card } from "@/components/ui/card"
+import { BusinessDisclaimer } from "@/components/dashboard/business-disclaimer"
 import { FunnelChart } from "@/components/dashboard/funnel-chart"
 import { DateRangePicker } from "@/components/dashboard/date-range-picker"
 import { getFunnelData, type FunnelStage } from "@/lib/queries/funnel"
@@ -6,6 +7,128 @@ import { formatNumber, formatPercent } from "@/lib/utils/format"
 
 interface Props {
   searchParams: Promise<{ from?: string; to?: string }>
+}
+
+const STAGE_DISCLAIMERS: Record<
+  string,
+  {
+    title: string
+    description: string
+    sections: { label: string; content: string }[]
+  }
+> = {
+  Entradas: {
+    title: "Entradas",
+    description: "Base total de leads captados no período.",
+    sections: [
+      {
+        label: "O que entra na conta",
+        content:
+          "Todo lead recebido e gravado na base, antes de qualquer triagem comercial.",
+      },
+      {
+        label: "Na prática",
+        content:
+          "É o topo do funil e representa toda a demanda que chegou para a operação.",
+      },
+    ],
+  },
+  "CNPJ Válido": {
+    title: "CNPJ válido",
+    description: "Leads cujo documento passou na validação inicial.",
+    sections: [
+      {
+        label: "O que entra na conta",
+        content:
+          "Somente os leads com CNPJ considerado válido pela etapa de enriquecimento e conferência.",
+      },
+      {
+        label: "Na prática",
+        content:
+          "Mostra quanto da base captada chegou minimamente apta para seguir nas regras comerciais.",
+      },
+    ],
+  },
+  "Encaminhado a parceiro": {
+    title: "Rede parceira",
+    description: "Leads válidos que não entram no fluxo interno da ASX.",
+    sections: [
+      {
+        label: "O que entra na conta",
+        content:
+          "Leads que passaram na validação, mas foram redirecionados para distribuidores por regra comercial.",
+      },
+      {
+        label: "Na prática",
+        content:
+          "Esse número não representa perda pura do funil principal, e sim um desvio operacional para atendimento externo.",
+      },
+    ],
+  },
+  "Operacao ASX": {
+    title: "Operacao ASX",
+    description: "Leads que ficaram no pipeline comercial da ASX.",
+    sections: [
+      {
+        label: "O que entra na conta",
+        content:
+          "Leads classificados no Path 3, que permanecem sob responsabilidade do atendimento interno.",
+      },
+      {
+        label: "Na prática",
+        content:
+          "É o volume que efetivamente vira fila de qualificação e potencial handoff para vendedor.",
+      },
+    ],
+  },
+  "Primeiro contato": {
+    title: "Primeiro contato",
+    description: "Leads do atendimento interno que já saíram do status pendente.",
+    sections: [
+      {
+        label: "O que entra na conta",
+        content:
+          "O painel considera aqui os leads Path 3 que já chegaram pelo menos ao status 'contacted'. Também entram os que já avançaram além disso, como 'em conversa' e 'transferido'.",
+      },
+      {
+        label: "Na prática",
+        content:
+          "Esse número mostra quantos leads do fluxo interno já receberam o primeiro avanço operacional e deixaram de estar apenas aguardando ação.",
+      },
+    ],
+  },
+  "Em Conversa": {
+    title: "Em atendimento",
+    description: "Leads do atendimento interno que já entraram em interação ativa.",
+    sections: [
+      {
+        label: "O que entra na conta",
+        content:
+          "São os leads Path 3 que atingiram o status 'in_conversation'. Os que já foram transferidos também aparecem aqui porque necessariamente passaram por essa etapa antes do handoff.",
+      },
+      {
+        label: "Na prática",
+        content:
+          "Mostra quantas oportunidades já viraram conversa de fato, e não apenas tentativa inicial de contato.",
+      },
+    ],
+  },
+  "Com vendedor": {
+    title: "Com vendedor",
+    description: "Leads que concluíram a passagem do atendimento inicial para o comercial.",
+    sections: [
+      {
+        label: "O que entra na conta",
+        content:
+          "Somente os leads com status final de handoff concluído para o vendedor.",
+      },
+      {
+        label: "Na prática",
+        content:
+          "É o volume que atravessou o funil interno e chegou ao momento em que o vendedor passa a assumir a oportunidade.",
+      },
+    ],
+  },
 }
 
 export default async function FunilPage({ searchParams }: Props) {
@@ -22,13 +145,13 @@ export default async function FunilPage({ searchParams }: Props) {
     stageMap.get("Entradas"),
     stageMap.get("CNPJ Válido"),
     stageMap.get("Encaminhado a parceiro"),
-    stageMap.get("Atendimento interno"),
+    stageMap.get("Operacao ASX"),
   ].filter(Boolean) as FunnelStage[]
 
   const pipelineStages = [
     stageMap.get("Primeiro contato"),
     stageMap.get("Em Conversa"),
-    stageMap.get("Transferido ao vendedor"),
+    stageMap.get("Com vendedor"),
   ].filter(Boolean) as FunnelStage[]
 
   return (
@@ -39,8 +162,8 @@ export default async function FunilPage({ searchParams }: Props) {
             {period ? "Período personalizado" : "Todos os leads"}
           </p>
           <p className="mt-1 max-w-3xl text-sm text-[#94A3B8]">
-            A leitura separa triagem inicial, encaminhamento a parceiros e
-            avancos do time interno sem misturar fluxos diferentes.
+            A leitura separa triagem inicial, rede parceira e avancos da
+            operacao ASX sem misturar fluxos diferentes.
           </p>
         </div>
         <DateRangePicker />
@@ -55,8 +178,8 @@ export default async function FunilPage({ searchParams }: Props) {
               helper={
                 stage.stage === "Encaminhado a parceiro"
                   ? "segue para parceiro"
-                  : stage.stage === "Atendimento interno"
-                    ? "segue para o time interno"
+                  : stage.stage === "Operacao ASX"
+                    ? "segue para a ASX"
                     : stage.stage === "CNPJ Válido"
                       ? "documento conferido"
                       : "base recebida"
@@ -70,10 +193,10 @@ export default async function FunilPage({ searchParams }: Props) {
         <Card className="bg-white px-4 md:px-5">
           <div className="space-y-1">
             <h2 className="text-base font-medium text-[#111827]">
-              Funil do atendimento interno
+              Jornada da operacao ASX
             </h2>
             <p className="text-sm text-[#6B7280]">
-              Cada etapa mostra o volume atual, a participação no total e a taxa
+              Cada etapa mostra o volume atual, a participacao no total e a taxa
               de retenção em relação ao estágio anterior.
             </p>
           </div>
@@ -85,10 +208,10 @@ export default async function FunilPage({ searchParams }: Props) {
           <Card className="bg-white px-4 md:px-5">
             <div className="space-y-1">
               <h2 className="text-base font-medium text-[#111827]">
-                Encaminhados a parceiros
+                Fluxo para rede parceira
               </h2>
               <p className="text-sm text-[#6B7280]">
-                Leads com CNPJ valido que nao seguem no time interno e sao
+                Leads com CNPJ valido que nao seguem na operacao ASX e sao
                 enviados para parceiros regionais.
               </p>
             </div>
@@ -97,7 +220,7 @@ export default async function FunilPage({ searchParams }: Props) {
               <div className="flex items-center justify-between gap-3">
                 <div>
                   <p className="text-sm font-medium text-[#92400E]">
-                    Encaminhado a parceiro
+                    Rede parceira
                   </p>
                   <p className="mt-1 text-3xl font-semibold tracking-tight text-[#111827]">
                     {formatNumber(stageMap.get("Encaminhado a parceiro")?.count ?? 0)}
@@ -121,10 +244,10 @@ export default async function FunilPage({ searchParams }: Props) {
           <Card className="bg-white px-4 md:px-5">
             <div className="space-y-1">
               <h2 className="text-base font-medium text-[#111827]">
-                Etapas finais do atendimento
+                Etapas finais da operacao
               </h2>
               <p className="text-sm text-[#6B7280]">
-                Leitura rapida do avanco do time interno ate chegar ao vendedor.
+                Leitura rapida do avanco da ASX ate chegar ao vendedor.
               </p>
             </div>
 
@@ -135,10 +258,16 @@ export default async function FunilPage({ searchParams }: Props) {
                   className="rounded-2xl border border-[#E5E7EB] bg-[#FCFCFD] p-3"
                 >
                   <div className="flex items-center justify-between gap-3">
-                    <div>
+                  <div>
+                    <div className="flex items-center gap-2">
                       <p className="text-sm font-medium text-[#111827]">
                         {stage.stage}
                       </p>
+                      <BusinessDisclaimer
+                        {...STAGE_DISCLAIMERS[stage.stage]}
+                        side="left"
+                      />
+                    </div>
                       <p className="mt-1 text-xs text-[#6B7280]">
                         {formatPercent(stage.percentage)} do total de leads
                       </p>
@@ -163,7 +292,7 @@ export default async function FunilPage({ searchParams }: Props) {
         <Card className="bg-white px-4 md:px-5">
           <div className="space-y-1">
             <h2 className="text-base font-medium text-[#111827]">
-              Taxas de Conversão
+              Taxas de Conversao
             </h2>
             <p className="text-sm text-[#6B7280]">
               Cada linha mostra quantos leads avançaram, quantos ficaram pelo
@@ -226,7 +355,14 @@ function StageSummaryCard({
         style={{ backgroundColor: stage.color }}
       />
       <div className="space-y-1">
-        <p className="text-sm font-medium text-[#111827]">{stage.stage}</p>
+        <div className="flex items-center gap-2">
+          <p className="text-sm font-medium text-[#111827]">{stage.stage}</p>
+          <BusinessDisclaimer
+            {...STAGE_DISCLAIMERS[stage.stage]}
+            side="bottom"
+            align="start"
+          />
+        </div>
         <p className="text-xs uppercase tracking-[0.16em] text-[#94A3B8]">
           {helper}
         </p>

@@ -88,13 +88,14 @@ export async function getFunnelData(period?: DateRange): Promise<FunnelData> {
     },
     {
       stage: "Encaminhado a parceiro",
+      
       count: path2,
       percentage: pct(path2),
       color: COLORS.path2,
       fromPreviousRate: rate(path2, cnpjValid),
     },
     {
-      stage: "Atendimento interno",
+      stage: "Operacao ASX",
       count: path3,
       percentage: pct(path3),
       color: COLORS.path3,
@@ -115,7 +116,7 @@ export async function getFunnelData(period?: DateRange): Promise<FunnelData> {
       fromPreviousRate: rate(inConversation, contacted),
     },
     {
-      stage: "Transferido ao vendedor",
+      stage: "Com vendedor",
       count: handoff,
       percentage: pct(handoff),
       color: COLORS.handoff,
@@ -142,7 +143,7 @@ export async function getFunnelData(period?: DateRange): Promise<FunnelData> {
       drop: total - cnpjValid,
     },
     {
-      label: "CNPJ valido -> Atendimento interno",
+      label: "CNPJ valido -> Operacao ASX",
       rate: rate(path3, cnpjValid),
       color: COLORS.path3,
       base: cnpjValid,
@@ -150,7 +151,7 @@ export async function getFunnelData(period?: DateRange): Promise<FunnelData> {
       drop: cnpjValid - path3,
     },
     {
-      label: "Atendimento interno -> Primeiro contato",
+      label: "Operacao ASX -> Primeiro contato",
       rate: rate(contacted, path3),
       color: COLORS.contacted,
       base: path3,
@@ -166,7 +167,7 @@ export async function getFunnelData(period?: DateRange): Promise<FunnelData> {
       drop: contacted - inConversation,
     },
     {
-      label: "Em conversa -> Transferido ao vendedor",
+      label: "Em atendimento -> Com vendedor",
       rate: rate(handoff, inConversation),
       color: COLORS.handoff,
       base: inConversation,

@@ -61,12 +61,12 @@ export function TrendLine({ data }: TrendLineProps) {
           helper="soma das entradas neste recorte"
         />
         <SummaryChip
-          label="Atendimento interno"
+          label="Operacao ASX"
           value={formatNumber(totalQualified)}
           helper="leads que ficaram com o time ASX"
         />
         <SummaryChip
-          label="Participacao interna"
+          label="Participacao na operacao"
           value={`${qualifiedShare.toFixed(1)}%`}
           helper="fatia do volume que avancou no time"
         />
@@ -82,7 +82,7 @@ export function TrendLine({ data }: TrendLineProps) {
           <div className="flex flex-wrap items-center gap-2">
             <LegendChip label="Entradas" color="#B2121A" note={`pico ${formatNumber(peakLeads)}`} />
             <LegendChip
-              label="Atendimento interno"
+              label="Operacao ASX"
               color="#059669"
               note={`pico ${formatNumber(peakQualified)}`}
               line
@@ -133,7 +133,7 @@ export function TrendLine({ data }: TrendLineProps) {
                       </p>
                       <div className="mt-2 space-y-1.5">
                         <TooltipRow color="#B2121A" label="Entradas" value={totalLeads} />
-                        <TooltipRow color="#059669" label="Atendimento interno" value={qualified} />
+                        <TooltipRow color="#059669" label="Operacao ASX" value={qualified} />
                       </div>
                     </div>
                   )
@@ -155,7 +155,7 @@ export function TrendLine({ data }: TrendLineProps) {
                 strokeWidth={2.5}
                 dot={false}
                 activeDot={{ r: 4, fill: "#059669", stroke: "#fff", strokeWidth: 2 }}
-                name="Atendimento interno"
+                name="Operacao ASX"
               />
             </ComposedChart>
           </ResponsiveContainer>

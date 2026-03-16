@@ -31,21 +31,21 @@ export async function comparePeriods(
       format: "number",
     },
     {
-      label: "Atendimento interno",
+      label: "Operacao ASX",
       periodA: statsA.qualified,
       periodB: statsB.qualified,
       delta: delta(statsA.qualified, statsB.qualified),
       format: "number",
     },
     {
-      label: "Transferidos ao vendedor",
+      label: "Com vendedor",
       periodA: statsA.handoff,
       periodB: statsB.handoff,
       delta: delta(statsA.handoff, statsB.handoff),
       format: "number",
     },
     {
-      label: "Taxa de transferencia",
+      label: "Repasse ao vendedor",
       periodA: statsA.total > 0 ? Math.round((statsA.handoff / statsA.total) * 1000) / 10 : 0,
       periodB: statsB.total > 0 ? Math.round((statsB.handoff / statsB.total) * 1000) / 10 : 0,
       delta: delta(
@@ -55,7 +55,7 @@ export async function comparePeriods(
       format: "percent",
     },
     {
-      label: "Pontuacao media",
+      label: "Qualidade media",
       periodA: statsA.avgScore,
       periodB: statsB.avgScore,
       delta: delta(statsA.avgScore, statsB.avgScore),

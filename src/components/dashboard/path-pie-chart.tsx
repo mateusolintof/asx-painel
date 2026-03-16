@@ -5,6 +5,7 @@ import {
   Building2,
   BriefcaseBusiness,
 } from "lucide-react"
+import { BusinessDisclaimer } from "@/components/dashboard/business-disclaimer"
 import { formatNumber, formatPercent } from "@/lib/utils/format"
 
 interface PathPieChartProps {
@@ -13,8 +14,66 @@ interface PathPieChartProps {
 
 const DESTINATION_HELPERS: Record<string, string> = {
   "Fora do perfil": "contatos descartados antes do atendimento",
-  "Encaminhado a parceiro": "seguiram para parceiros regionais",
-  "Atendimento interno": "seguiram para o time comercial da ASX",
+  "Rede parceira": "seguiram para parceiros regionais",
+  "Operacao ASX": "seguiram para o time comercial da ASX",
+}
+
+const DESTINATION_DISCLAIMERS: Record<
+  string,
+  {
+    title: string
+    description: string
+    sections: { label: string; content: string }[]
+  }
+> = {
+  "Fora do perfil": {
+    title: "Fora do perfil",
+    description: "Leads que não seguiram para atendimento comercial.",
+    sections: [
+      {
+        label: "O que significa",
+        content:
+          "Entram aqui os contatos que foram barrados logo na triagem inicial, como casos de CNPJ inválido ou enquadramento fora da política comercial.",
+      },
+      {
+        label: "Na prática",
+        content:
+          "É o volume de entradas que consumiu captação, mas não virou oportunidade de atendimento para a ASX nem para parceiros.",
+      },
+    ],
+  },
+  "Rede parceira": {
+    title: "Rede parceira",
+    description: "Leads que saíram da operação interna e foram redirecionados.",
+    sections: [
+      {
+        label: "O que significa",
+        content:
+          "São leads válidos, mas que não entram no atendimento interno da ASX por regra comercial, como região fora do foco ou volume abaixo do corte definido.",
+      },
+      {
+        label: "Na prática",
+        content:
+          "Esse número mostra quanto da demanda foi aproveitada pela rede parceira, em vez de virar oportunidade direta para o time interno.",
+      },
+    ],
+  },
+  "Operacao ASX": {
+    title: "Operacao ASX",
+    description: "Leads que ficaram sob responsabilidade direta da ASX.",
+    sections: [
+      {
+        label: "O que significa",
+        content:
+          "São os leads classificados no Path 3: passaram na triagem, se encaixaram nas regras comerciais e entraram na fila de atendimento da ASX.",
+      },
+      {
+        label: "Participação interna",
+        content:
+          "A participação mostrada no card é a fatia desse grupo dentro de todas as entradas do período. Em linguagem de negócio, ela mostra quanto da demanda captada realmente ficou para o time interno trabalhar.",
+      },
+    ],
+  },
 }
 
 export function PathPieChart({ data }: PathPieChartProps) {
@@ -40,7 +99,7 @@ export function PathPieChart({ data }: PathPieChartProps) {
               {formatNumber(total)}
             </p>
             <p className="max-w-xl text-sm text-[#6B7280]">
-              leads distribuidos entre descarte, parceiros e time comercial
+              leads distribuidos entre descarte, rede parceira e time comercial
               interno.
             </p>
           </div>
@@ -110,9 +169,26 @@ export function PathPieChart({ data }: PathPieChartProps) {
                     <Icon className="h-5 w-5" />
                   </div>
                   <div>
-                    <p className="text-sm font-semibold text-[#111827]">
-                      {item.name}
-                    </p>
+                    <div className="flex items-center gap-2">
+                      <p className="text-sm font-semibold text-[#111827]">
+                        {item.name}
+                      </p>
+                      <BusinessDisclaimer
+                        title={DESTINATION_DISCLAIMERS[item.name]?.title ?? item.name}
+                        description={
+                          DESTINATION_DISCLAIMERS[item.name]?.description ??
+                          "Explicação do destino operacional."
+                        }
+                        sections={
+                          DESTINATION_DISCLAIMERS[item.name]?.sections ?? [
+                            {
+                              label: "Como ler",
+                              content: "Representa a participação desse destino dentro do período analisado.",
+                            },
+                          ]
+                        }
+                      />
+                    </div>
                     <p className="mt-1 text-xs text-[#8A94A6]">
                       {DESTINATION_HELPERS[item.name] ?? "destino operacional"}
                     </p>
@@ -134,7 +210,7 @@ export function PathPieChart({ data }: PathPieChartProps) {
               </div>
 
               <div className="mt-2 flex items-center justify-between gap-2 text-xs text-[#6B7280]">
-                <span>participacao no periodo</span>
+                <span>participação entre as entradas</span>
                 <span className="font-medium text-[#475569]">
                   {formatPercent(share)}
                 </span>
@@ -149,6 +225,6 @@ export function PathPieChart({ data }: PathPieChartProps) {
 
 function getDestinationIcon(name: string) {
   if (name === "Fora do perfil") return BadgeAlert
-  if (name === "Encaminhado a parceiro") return Building2
+  if (name === "Rede parceira") return Building2
   return BriefcaseBusiness
 }
